@@ -26,7 +26,8 @@
     -->
     <title>Places</title>
     <script
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBV6hMD2kj0hW1W2lir1Tb8qfZTpam_BKA"
+      src="https://maps.googleapis.com/maps/api/js?key="
+      +`${process.env.REACT_APP_GMAP_API_KEY}`
       async
       defer
     ></script>
