@@ -24,11 +24,21 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <title>React App</title>
+    <title>Places</title>
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBV6hMD2kj0hW1W2lir1Tb8qfZTpam_BKA"
+      async
+      defer
+    ></script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
+
+    <div id="backdrop"></div>
+    <div id="modal"></div>
+    <div id="drawer"></div>
     <div id="root"></div>
+
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
