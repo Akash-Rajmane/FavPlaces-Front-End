@@ -1,3 +1,14 @@
+### Hosted Link: https://favplaces.netlify.app
+
+Technical Stack Used: ReactJS, HTML, CSS, JavaScript, React-Router-Dom, NodeJS, ExpressJS, MongoDB, JWT Authentication, Google Maps API
+
+Features:
+◾️User signup, login and logout.
+◾️User can Add, Edit, Delete places.
+◾️User can see other users and their saved places.
+◾️Automatic generation of map on inputting address.
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
