@@ -1,5 +1,7 @@
 ### Hosted Link: https://favplaces.netlify.app
 
+### BackEnd Repo: https://github.com/Akash-Rajmane/FavPlaces-Back-End
+
 ### Technical Stack Used: ReactJS, HTML, CSS, JavaScript, React-Router-Dom, NodeJS, ExpressJS, MongoDB, JWT Authentication, Google Maps API
 
 ### Features:
