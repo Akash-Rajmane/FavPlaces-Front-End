@@ -27,16 +27,17 @@ const useHttpClient = () => {
         );
 
         if (!response.ok) {
-          throw new Error(responseData.message);
+          throw new Error(responseData.message || "Request failed.");
         }
 
         setIsLoading(false);
         return responseData;
       } catch (err) {
-        if (err.message === "The user aborted a request.") {
-          return;
+        if (err.name === "AbortError") {
+          console.log("Request was aborted.");
+          return; // Ignore abort errors
         }
-        setError(err.message);
+        setError(err.message || "Something went wrong.");
         setIsLoading(false);
         throw err;
       }
@@ -49,6 +50,7 @@ const useHttpClient = () => {
   };
 
   useEffect(() => {
+    // Cleanup abort controllers on component unmount
     return () => {
       activeHttpRequests.current.forEach((abortCtrl) => abortCtrl.abort());
     };
