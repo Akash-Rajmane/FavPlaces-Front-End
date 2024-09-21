@@ -1,4 +1,4 @@
-### Hosted Link: https://favplaces.netlify.app
+### Hosted Link: https://fav-places.vercel.app
 
 ### BackEnd Repo: https://github.com/Akash-Rajmane/FavPlaces-Back-End
 
