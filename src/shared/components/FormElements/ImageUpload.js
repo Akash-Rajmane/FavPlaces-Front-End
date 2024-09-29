@@ -116,6 +116,9 @@ const ImageUpload = (props) => {
     setFile(dataUrl); // Store the captured image as a data URL string
     setIsValid(true);
 
+    // Pass the captured image data to the onInput function
+    props.onInput(props.id, dataUrl, true); // 'true' indicates the file is valid
+
     // Stop video stream
     stream.getTracks().forEach((track) => track.stop());
   };
