@@ -109,18 +109,31 @@ const ImageUpload = (props) => {
     const video = videoRef.current;
     const context = canvas.getContext("2d");
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    const dataUrl = canvas.toDataURL("image/png");
 
-    setPreviewUrl(dataUrl); // Set preview as data URL
+    // Convert canvas to Blob (image file)
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        console.error("Failed to create blob from canvas");
+        return;
+      }
+
+      // Create a file from the blob with a timestamped name
+      const file = new File([blob], `captured-image-${Date.now()}.png`, {
+        type: "image/png",
+      });
+
+      setFile(file); // Store the file object
+      setPreviewUrl(URL.createObjectURL(file)); // Set preview to the object URL
+      setIsValid(true);
+
+      // Pass the file to the onInput function
+      props.onInput(props.id, file, true); // 'true' indicates the file is valid
+
+      // Stop the video stream
+      stream.getTracks().forEach((track) => track.stop());
+    }, "image/png"); // Specify the image format as PNG
+
     setIsTakingPicture(false);
-    setFile(dataUrl); // Store the captured image as a data URL string
-    setIsValid(true);
-
-    // Pass the captured image data to the onInput function
-    props.onInput(props.id, dataUrl, true); // 'true' indicates the file is valid
-
-    // Stop video stream
-    stream.getTracks().forEach((track) => track.stop());
   };
 
   // Reset the current image or camera preview to allow switching between modes
