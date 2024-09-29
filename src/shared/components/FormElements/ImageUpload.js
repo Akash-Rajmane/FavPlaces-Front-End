@@ -118,16 +118,20 @@ const ImageUpload = (props) => {
       }
 
       // Create a file from the blob with a timestamped name
-      const file = new File([blob], `captured-image-${Date.now()}.png`, {
-        type: "image/png",
-      });
+      const capturedfile = new File(
+        [blob],
+        `captured-image-${Date.now()}.png`,
+        {
+          type: "image/png",
+        }
+      );
 
-      setFile(file); // Store the file object
-      setPreviewUrl(URL.createObjectURL(file)); // Set preview to the object URL
+      setFile(capturedfile); // Store the file object
+      setPreviewUrl(URL.createObjectURL(capturedfile)); // Set preview to the object URL
       setIsValid(true);
 
       // Pass the file to the onInput function
-      props.onInput(props.id, file, true); // 'true' indicates the file is valid
+      props.onInput(props.id, capturedfile, true); // 'true' indicates the file is valid
 
       // Stop the video stream
       stream.getTracks().forEach((track) => track.stop());
