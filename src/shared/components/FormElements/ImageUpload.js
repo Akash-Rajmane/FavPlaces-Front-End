@@ -8,7 +8,7 @@ const ImageUpload = (props) => {
   const [isValid, setIsValid] = useState(false);
   const [isTakingPicture, setIsTakingPicture] = useState(false);
   const [stream, setStream] = useState(null);
-  const [cameraFacing, setCameraFacing] = useState("user"); // Default to front camera
+  const cameraFacingRef = useRef("user"); // Use useRef for camera facing
   const [isMobile, setIsMobile] = useState(false); // State to check if the user is on mobile
 
   const filePickerRef = useRef(null);
@@ -91,7 +91,7 @@ const ImageUpload = (props) => {
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: { exact: cameraFacing }, // Select front or back camera
+          facingMode: { exact: cameraFacingRef.current }, // Select front or back camera
         },
       });
       videoRef.current.srcObject = mediaStream;
@@ -133,9 +133,10 @@ const ImageUpload = (props) => {
 
   // Handle camera toggle between front and back
   const toggleCameraHandler = () => {
-    setCameraFacing((prevState) =>
-      prevState === "user" ? "environment" : "user"
-    );
+    // Toggle camera facing direction using ref
+    cameraFacingRef.current =
+      cameraFacingRef.current === "user" ? "environment" : "user";
+    takePictureHandler(); // Restart the camera with the new facing mode
   };
 
   return (
@@ -173,7 +174,7 @@ const ImageUpload = (props) => {
             </Button>
             {isMobile && ( // Only show the switch button if on mobile
               <Button type="button" onClick={toggleCameraHandler}>
-                {cameraFacing === "user"
+                {cameraFacingRef.current === "user"
                   ? "SWITCH TO BACK CAMERA"
                   : "SWITCH TO FRONT CAMERA"}
               </Button>
