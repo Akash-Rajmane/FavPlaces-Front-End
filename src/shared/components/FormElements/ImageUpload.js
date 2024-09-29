@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import Button from "./Button";
 import "./ImageUpload.css";
 
@@ -86,7 +86,7 @@ const ImageUpload = (props) => {
   };
 
   // Handle camera access for taking a picture with backward compatibility
-  const takePictureHandler = async () => {
+  const takePictureHandler = useCallback(async () => {
     setIsTakingPicture(true);
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
@@ -100,7 +100,13 @@ const ImageUpload = (props) => {
       console.error("Error accessing the camera", err);
       setIsTakingPicture(false);
     }
-  };
+  }, [cameraFacing]);
+
+  useEffect(() => {
+    if (isTakingPicture) {
+      takePictureHandler();
+    }
+  }, [cameraFacing, isTakingPicture, takePictureHandler]);
 
   // Capture image from video stream
   const captureImageHandler = () => {
@@ -141,7 +147,6 @@ const ImageUpload = (props) => {
     setCameraFacing((prevState) =>
       prevState === "user" ? "environment" : "user"
     );
-    takePictureHandler(); // Restart the camera with the new facing mode
   };
 
   return (
