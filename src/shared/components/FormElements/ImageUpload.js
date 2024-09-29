@@ -177,7 +177,7 @@ const ImageUpload = (props) => {
             <Button type="button" onClick={captureImageHandler}>
               CAPTURE
             </Button>
-            {!isMobile && ( // Only show the switch button if on mobile
+            {isMobile && ( // Only show the switch button if on mobile
               <Button type="button" onClick={toggleCameraHandler}>
                 {cameraFacing === "user"
                   ? "SWITCH TO BACK CAMERA"
