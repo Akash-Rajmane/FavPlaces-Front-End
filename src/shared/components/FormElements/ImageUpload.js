@@ -8,6 +8,8 @@ const ImageUpload = (props) => {
   const [isValid, setIsValid] = useState(false);
   const [isTakingPicture, setIsTakingPicture] = useState(false);
   const [stream, setStream] = useState(null);
+  const [cameraFacing, setCameraFacing] = useState("user"); // Default to front camera
+  const [isMobile, setIsMobile] = useState(false); // State to check if the user is on mobile
 
   const filePickerRef = useRef(null);
   const videoRef = useRef(null);
@@ -39,6 +41,12 @@ const ImageUpload = (props) => {
   };
 
   useEffect(() => {
+    // Check if the user is on a mobile device
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    const mobileRegex =
+      /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i;
+    setIsMobile(mobileRegex.test(userAgent));
+
     initializeMedia();
   }, []);
 
@@ -82,7 +90,9 @@ const ImageUpload = (props) => {
     setIsTakingPicture(true);
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: true,
+        video: {
+          facingMode: { exact: cameraFacing }, // Select front or back camera
+        },
       });
       videoRef.current.srcObject = mediaStream;
       setStream(mediaStream);
@@ -121,6 +131,13 @@ const ImageUpload = (props) => {
     }
   };
 
+  // Handle camera toggle between front and back
+  const toggleCameraHandler = () => {
+    setCameraFacing((prevState) =>
+      prevState === "user" ? "environment" : "user"
+    );
+  };
+
   return (
     <div className="form-control">
       <input
@@ -143,9 +160,25 @@ const ImageUpload = (props) => {
           )}
         </div>
         {isTakingPicture ? (
-          <Button type="button" onClick={captureImageHandler}>
-            CAPTURE
-          </Button>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "10px",
+              marginBottom: "10px",
+            }}
+          >
+            <Button type="button" onClick={captureImageHandler}>
+              CAPTURE
+            </Button>
+            {isMobile && ( // Only show the switch button if on mobile
+              <Button type="button" onClick={toggleCameraHandler}>
+                {cameraFacing === "user"
+                  ? "SWITCH TO BACK CAMERA"
+                  : "SWITCH TO FRONT CAMERA"}
+              </Button>
+            )}
+          </div>
         ) : (
           <div
             style={{
