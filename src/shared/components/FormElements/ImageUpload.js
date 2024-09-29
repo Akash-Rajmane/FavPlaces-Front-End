@@ -8,7 +8,7 @@ const ImageUpload = (props) => {
   const [isValid, setIsValid] = useState(false);
   const [isTakingPicture, setIsTakingPicture] = useState(false);
   const [stream, setStream] = useState(null);
-  const cameraFacingRef = useRef("user"); // Use useRef for camera facing
+  const [cameraFacing, setCameraFacing] = useState("user"); // default front camera
   const [isMobile, setIsMobile] = useState(false); // State to check if the user is on mobile
 
   const filePickerRef = useRef(null);
@@ -91,7 +91,7 @@ const ImageUpload = (props) => {
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: { exact: cameraFacingRef.current }, // Select front or back camera
+          facingMode: { exact: cameraFacing }, // Select front or back camera
         },
       });
       videoRef.current.srcObject = mediaStream;
@@ -133,9 +133,14 @@ const ImageUpload = (props) => {
 
   // Handle camera toggle between front and back
   const toggleCameraHandler = () => {
-    // Toggle camera facing direction using ref
-    cameraFacingRef.current =
-      cameraFacingRef.current === "user" ? "environment" : "user";
+    // Stop the current camera stream before changing the facing mode
+    if (stream) {
+      stream.getTracks().forEach((track) => track.stop());
+    }
+    // Toggle camera facing direction
+    setCameraFacing((prevState) =>
+      prevState === "user" ? "environment" : "user"
+    );
     takePictureHandler(); // Restart the camera with the new facing mode
   };
 
@@ -172,9 +177,9 @@ const ImageUpload = (props) => {
             <Button type="button" onClick={captureImageHandler}>
               CAPTURE
             </Button>
-            {isMobile && ( // Only show the switch button if on mobile
+            {!isMobile && ( // Only show the switch button if on mobile
               <Button type="button" onClick={toggleCameraHandler}>
-                {cameraFacingRef.current === "user"
+                {cameraFacing === "user"
                   ? "SWITCH TO BACK CAMERA"
                   : "SWITCH TO FRONT CAMERA"}
               </Button>
