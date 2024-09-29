@@ -133,7 +133,7 @@ const ImageUpload = (props) => {
   };
 
   // Handle camera toggle between front and back
-  const toggleCameraHandler = async () => {
+  const toggleCameraHandler = () => {
     // Stop the current camera stream before changing the facing mode
     if (stream) {
       stream.getTracks().forEach((track) => track.stop());
@@ -144,7 +144,7 @@ const ImageUpload = (props) => {
     setCameraFacing(newFacing);
 
     // Start the camera again with the new facing mode
-    await takePictureHandler(); // Ensure this is called after updating the state
+    takePictureHandler(); // Ensure this is called after updating the state
   };
   return (
     <div className="form-control">
@@ -167,7 +167,26 @@ const ImageUpload = (props) => {
             <p>Please pick an image or take a picture.</p>
           )}
         </div>
-        {isTakingPicture ? (
+        {/* Conditionally render the "Pick Image" and "Take Picture" buttons only if no file is selected & while not taking picture  */}
+        {!isTakingPicture && !file && (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "10px",
+              marginBottom: "10px",
+            }}
+          >
+            <Button type="button" onClick={pickImageHandler}>
+              PICK IMAGE
+            </Button>
+            <Button type="button" onClick={takePictureHandler}>
+              TAKE PICTURE
+            </Button>
+          </div>
+        )}
+        {/* Show the "Capture" and "Switch Camera" buttons when taking a picture */}
+        {isTakingPicture && (
           <div
             style={{
               display: "flex",
@@ -189,22 +208,6 @@ const ImageUpload = (props) => {
                 />
               </Button>
             )}
-          </div>
-        ) : (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "10px",
-              marginBottom: "10px",
-            }}
-          >
-            <Button type="button" onClick={pickImageHandler}>
-              PICK IMAGE
-            </Button>
-            <Button type="button" onClick={takePictureHandler}>
-              TAKE PICTURE
-            </Button>
           </div>
         )}
         {file && (
