@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import Button from "./Button";
 import "./ImageUpload.css";
+import CameraIcon from "../../../assets/switch-camera.png";
 
 const ImageUpload = (props) => {
   const [file, setFile] = useState(null);
@@ -180,9 +181,12 @@ const ImageUpload = (props) => {
             </Button>
             {isMobile && ( // Only show the switch button if on mobile
               <Button type="button" onClick={toggleCameraHandler}>
-                {cameraFacing === "user"
-                  ? "SWITCH TO BACK CAMERA"
-                  : "SWITCH TO FRONT CAMERA"}
+                <img
+                  src={CameraIcon}
+                  alt="switch camera"
+                  width={"20px"}
+                  height={"20px"}
+                />
               </Button>
             )}
           </div>
