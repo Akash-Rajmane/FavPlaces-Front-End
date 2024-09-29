@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useCallback } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Button from "./Button";
 import "./ImageUpload.css";
 
@@ -86,7 +86,7 @@ const ImageUpload = (props) => {
   };
 
   // Handle camera access for taking a picture with backward compatibility
-  const takePictureHandler = useCallback(async () => {
+  const takePictureHandler = async () => {
     setIsTakingPicture(true);
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
@@ -100,13 +100,7 @@ const ImageUpload = (props) => {
       console.error("Error accessing the camera", err);
       setIsTakingPicture(false);
     }
-  }, [cameraFacing]);
-
-  useEffect(() => {
-    if (isTakingPicture) {
-      takePictureHandler();
-    }
-  }, [cameraFacing, isTakingPicture, takePictureHandler]);
+  };
 
   // Capture image from video stream
   const captureImageHandler = () => {
@@ -138,17 +132,19 @@ const ImageUpload = (props) => {
   };
 
   // Handle camera toggle between front and back
-  const toggleCameraHandler = () => {
+  const toggleCameraHandler = async () => {
     // Stop the current camera stream before changing the facing mode
     if (stream) {
       stream.getTracks().forEach((track) => track.stop());
     }
-    // Toggle camera facing direction
-    setCameraFacing((prevState) =>
-      prevState === "user" ? "environment" : "user"
-    );
-  };
 
+    // Toggle camera facing direction and immediately take picture
+    const newFacing = cameraFacing === "user" ? "environment" : "user";
+    setCameraFacing(newFacing);
+
+    // Start the camera again with the new facing mode
+    await takePictureHandler(); // Ensure this is called after updating the state
+  };
   return (
     <div className="form-control">
       <input
