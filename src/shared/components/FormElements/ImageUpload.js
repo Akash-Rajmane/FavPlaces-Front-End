@@ -1,7 +1,8 @@
 import React, { useRef, useState, useEffect } from "react";
 import Button from "./Button";
 import "./ImageUpload.css";
-import CameraIcon from "../../../assets/switch-camera.png";
+import SwicthCameraIcon from "../../../assets/switch-camera.png";
+import CameraIcon from "../../../assets/photo-camera.png";
 
 const ImageUpload = (props) => {
   const [file, setFile] = useState(null);
@@ -9,7 +10,7 @@ const ImageUpload = (props) => {
   const [isValid, setIsValid] = useState(false);
   const [isTakingPicture, setIsTakingPicture] = useState(false);
   const [stream, setStream] = useState(null);
-  const [cameraFacing, setCameraFacing] = useState("user"); // default front camera
+  const cameraFacingRef = useRef("user"); // default front camera
   const [isMobile, setIsMobile] = useState(false); // State to check if the user is on mobile
 
   const filePickerRef = useRef(null);
@@ -92,7 +93,7 @@ const ImageUpload = (props) => {
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: { exact: cameraFacing }, // Select front or back camera
+          facingMode: { exact: cameraFacingRef.current }, // Select front or back camera
         },
       });
       videoRef.current.srcObject = mediaStream;
@@ -160,9 +161,8 @@ const ImageUpload = (props) => {
     }
 
     // Toggle camera facing direction and immediately take picture
-    const newFacing = cameraFacing === "user" ? "environment" : "user";
-    setCameraFacing(newFacing);
-
+    cameraFacingRef.current =
+      cameraFacingRef.current === "user" ? "environment" : "user";
     // Start the camera again with the new facing mode
     takePictureHandler(); // Ensure this is called after updating the state
   };
@@ -216,12 +216,17 @@ const ImageUpload = (props) => {
             }}
           >
             <Button type="button" onClick={captureImageHandler}>
-              CAPTURE
+              <img
+                src={CameraIcon}
+                alt="switch camera"
+                width={"20px"}
+                height={"20px"}
+              />
             </Button>
             {isMobile && ( // Only show the switch button if on mobile
               <Button type="button" onClick={toggleCameraHandler}>
                 <img
-                  src={CameraIcon}
+                  src={SwicthCameraIcon}
                   alt="switch camera"
                   width={"20px"}
                   height={"20px"}
