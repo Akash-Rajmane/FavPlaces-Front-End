@@ -52,6 +52,16 @@ const ImageUpload = (props) => {
     initializeMedia();
   }, []);
 
+  // Separate useEffect for cleaning up the camera stream
+  useEffect(() => {
+    // Cleanup function to stop the camera when the component unmounts
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, [stream]); // Depend on the stream variable
+
   // Effect for generating image preview from file input (only if file is a Blob/File)
   useEffect(() => {
     if (!file || typeof file === "string") {
@@ -104,14 +114,22 @@ const ImageUpload = (props) => {
     }
   };
 
-  // Capture image from video stream
   const captureImageHandler = () => {
     const canvas = canvasRef.current;
     const video = videoRef.current;
     const context = canvas.getContext("2d");
+
+    // Set canvas width and height to the video resolution for better quality
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    // Clear the canvas before drawing
+    context.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Directly draw the video frame onto the canvas without needing aspect ratio checks
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    // Convert canvas to Blob (image file)
+    // Convert the canvas content to a Blob (image file)
     canvas.toBlob((blob) => {
       if (!blob) {
         console.error("Failed to create blob from canvas");
@@ -127,16 +145,17 @@ const ImageUpload = (props) => {
         }
       );
 
-      setFile(capturedfile); // Store the file object
-      setPreviewUrl(URL.createObjectURL(capturedfile)); // Set preview to the object URL
+      // Set the captured image file and preview
+      setFile(capturedfile);
+      setPreviewUrl(URL.createObjectURL(capturedfile));
       setIsValid(true);
 
       // Pass the file to the onInput function
-      props.onInput(props.id, capturedfile, true); // 'true' indicates the file is valid
+      props.onInput(props.id, capturedfile, true);
 
       // Stop the video stream
       stream.getTracks().forEach((track) => track.stop());
-    }, "image/png"); // Specify the image format as PNG
+    }, "image/png");
 
     setIsTakingPicture(false);
   };
