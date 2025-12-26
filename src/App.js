@@ -11,6 +11,7 @@ import useAuth from "./shared/hooks/auth-hook";
 import { AuthContext } from "./shared/context/auth-context";
 import LoadingSpinner from "./shared/components/UIElements/LoadingSpinner";
 
+const Profile = React.lazy(() => import("./user/pages/Profile"));
 const Users = React.lazy(() => import("./user/pages/Users"));
 const NewPlace = React.lazy(() => import("./places/pages/NewPlace"));
 const UserPlaces = React.lazy(() => import("./places/pages/UserPlaces"));
@@ -26,6 +27,7 @@ function App() {
     routes = (
       <Routes>
         <Route path="/" element={<Users />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="/:userId/places" element={<UserPlaces />} />
         <Route path="/places/new" element={<NewPlace />} />
         <Route path="/places/:placeId" element={<UpdatePlace />} />
