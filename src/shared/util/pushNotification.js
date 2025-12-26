@@ -43,7 +43,7 @@ export async function subscribeToPush(token) {
     applicationServerKey,
   });
 
-  await fetch(`${API_URL}/api/push/subscribe`, {
+  await fetch(`${API_URL}/push/subscribe`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
