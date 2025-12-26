@@ -41,3 +41,41 @@
   margin-bottom: 12px;
   font-size: 18px;
 }
+
+.follow-request-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.follow-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.accept-btn {
+  background: #2ecc71;
+  border: none;
+  padding: 4px 10px;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.reject-btn {
+  background: #e74c3c;
+  border: none;
+  padding: 4px 10px;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.accept-btn:hover {
+  background: #27ae60;
+}
+
+.reject-btn:hover {
+  background: #c0392b;
+}
