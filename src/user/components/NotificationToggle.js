@@ -1,70 +1,48 @@
-import { useEffect, useState, useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../shared/context/auth-context";
+import useHttpClient from "../../shared/hooks/http-hook";
 import {
   subscribeToPush,
   unsubscribeFromPush,
   isPushEnabled,
 } from "../../shared/util/pushNotification";
 
-import "./NotificationToggle.css";
+const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const NotificationToggle = () => {
   const auth = useContext(AuthContext);
+  const { sendRequest, isLoading, error } = useHttpClient();
   const [enabled, setEnabled] = useState(false);
-  const [loading, setLoading] = useState(true);
-  console.log(
-    "NotificationToggle render, enabled:",
-    enabled,
-    "loading:",
-    loading
-  );
+
   useEffect(() => {
-    isPushEnabled()
-      .then((status) => setEnabled(status))
-      .catch((err) => {
-        console.error("isPushEnabled failed", err);
-        setEnabled(false);
-      })
-      .finally(() => setLoading(false));
+    isPushEnabled().then(setEnabled);
   }, []);
 
   const toggleHandler = async () => {
-    setLoading(true);
     try {
       if (enabled) {
-        await unsubscribeFromPush(auth.token);
+        await unsubscribeFromPush(sendRequest, auth.token, API_URL);
         setEnabled(false);
       } else {
-        await subscribeToPush(auth.token);
+        await subscribeToPush(sendRequest, auth.token, API_URL);
         setEnabled(true);
       }
     } catch (err) {
-      alert(err.message || "Unable to update subscription");
-    } finally {
-      setLoading(false);
+      console.error(err);
     }
   };
 
-  const pushSupported = "serviceWorker" in navigator && "PushManager" in window;
-
   return (
-    <div className="toggle-container">
-      <span>Notifications</span>
-      <label className="switch">
-        <input
-          type="checkbox"
-          checked={enabled}
-          onChange={toggleHandler}
-          disabled={loading || !pushSupported}
-        />
-        <span className="slider" />
-      </label>
-      {!pushSupported && (
-        <div style={{ marginTop: 6, color: "#777", fontSize: 12 }}>
-          Push notifications are not supported in this browser.
-        </div>
-      )}
-    </div>
+    <label>
+      Notifications
+      <input
+        type="checkbox"
+        checked={enabled}
+        disabled={isLoading}
+        onChange={toggleHandler}
+      />
+      {error && <p>{error}</p>}
+    </label>
   );
 };
 

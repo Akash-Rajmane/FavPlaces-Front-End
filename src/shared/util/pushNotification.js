@@ -1,88 +1,67 @@
 const VAPID_KEY = process.env.REACT_APP_VAPID_PUBLIC_KEY;
-const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 // Convert a Base64 (URL-safe) string to a Uint8Array for the Push API
 function urlBase64ToUint8Array(base64String) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
   const rawData = window.atob(base64);
-  const outputArray = new Uint8Array(rawData.length);
-  for (let i = 0; i < rawData.length; ++i) {
-    outputArray[i] = rawData.charCodeAt(i);
-  }
-  return outputArray;
+  return Uint8Array.from([...rawData].map((c) => c.charCodeAt(0)));
 }
 
-export async function subscribeToPush(token) {
+// ⬇️ sendRequest is injected
+export async function subscribeToPush(sendRequest, token, apiUrl) {
   if (!("serviceWorker" in navigator)) {
-    throw new Error("Service workers are not supported in this browser");
+    throw new Error("Service workers not supported");
   }
   if (!("PushManager" in window)) {
-    throw new Error("Push messaging is not supported in this browser");
+    throw new Error("Push not supported");
   }
 
   const permission = await Notification.requestPermission();
   if (permission !== "granted") throw new Error("Permission denied");
 
-  // Use getRegistration() so we don't block waiting for a service worker
-  // to become active (navigator.serviceWorker.ready may never resolve in
-  // development if no SW is registered). If there's no registration,
-  // surface a clear error to the caller.
   const registration = await navigator.serviceWorker.getRegistration();
   if (!registration) {
-    throw new Error(
-      "No service worker registered. Push requires a registered service worker (use production build or register one)."
-    );
+    throw new Error("Service worker not registered");
   }
 
-  if (!VAPID_KEY) throw new Error("VAPID public key not configured");
-  const applicationServerKey = urlBase64ToUint8Array(VAPID_KEY);
+  if (!VAPID_KEY) throw new Error("VAPID key missing");
 
   const subscription = await registration.pushManager.subscribe({
     userVisibleOnly: true,
-    applicationServerKey,
+    applicationServerKey: urlBase64ToUint8Array(VAPID_KEY),
   });
 
-  await fetch(`${API_URL}/push/subscribe`, {
-    method: "POST",
-    headers: {
+  await sendRequest(
+    `${apiUrl}/push/subscribe`,
+    "POST",
+    JSON.stringify({ subscription }),
+    {
       "Content-Type": "application/json",
       Authorization: "Bearer " + token,
-    },
-    body: JSON.stringify({ subscription }),
-  });
+    }
+  );
 }
 
-export async function unsubscribeFromPush(token) {
-  if (!("serviceWorker" in navigator)) return;
+export async function unsubscribeFromPush(sendRequest, token, apiUrl) {
   const registration = await navigator.serviceWorker.getRegistration();
   if (!registration) return;
+
   const subscription = await registration.pushManager.getSubscription();
+  if (!subscription) return;
 
-  if (subscription) {
-    await subscription.unsubscribe();
+  await subscription.unsubscribe();
 
-    await fetch(`${API_URL}/api/push/unsubscribe`, {
-      method: "POST",
-      headers: {
-        Authorization: "Bearer " + token,
-      },
-    });
-  }
+  await sendRequest(`${apiUrl}/push/unsubscribe`, "POST", null, {
+    Authorization: "Bearer " + token,
+  });
 }
 
 export async function isPushEnabled() {
-  // Don't wait on navigator.serviceWorker.ready if service worker or Push isn't available
   if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
     return false;
   }
-  try {
-    const registration = await navigator.serviceWorker.getRegistration();
-    if (!registration) return false;
-    const subscription = await registration.pushManager.getSubscription();
-    return !!subscription;
-  } catch (err) {
-    console.error("isPushEnabled error", err);
-    return false;
-  }
+  const registration = await navigator.serviceWorker.getRegistration();
+  if (!registration) return false;
+  return !!(await registration.pushManager.getSubscription());
 }

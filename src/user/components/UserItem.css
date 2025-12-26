@@ -4,7 +4,14 @@
   min-width: 17.5rem;
 }
 
-.user-item a {
+.user-item__content {
+  padding: 0 !important;
+  position: relative;
+}
+
+/* Main clickable area */
+.user-item a,
+.user-item__link {
   display: flex;
   align-items: center;
   width: 100%;
@@ -16,12 +23,9 @@
 }
 
 .user-item a:hover,
-.user-item a:active {
+.user-item a:active,
+.user-item__link:hover {
   background: #54a4f5;
-}
-
-.user-item__content {
-  padding: 0 !important;
 }
 
 .user-item__image {
@@ -46,4 +50,51 @@
 
 .user-item__info h3 {
   margin: 0;
+}
+
+/* ---------------- FOLLOW BUTTON STYLES ---------------- */
+
+.user-item__actions {
+  padding: 0.75rem 1rem;
+  background: #1f1f1f;
+  text-align: center;
+}
+
+.user-item__actions.pending {
+  color: #f1c40f;
+  font-weight: bold;
+}
+
+/* Follow button */
+.follow-btn {
+  padding: 0.4rem 1.2rem;
+  border-radius: 20px;
+  border: none;
+  background: #ff0055;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.follow-btn:hover {
+  background: #e0004d;
+  transform: scale(1.05);
+}
+
+.follow-btn:active {
+  transform: scale(0.98);
+}
+
+/* Following state text */
+.user-item__actions.followed {
+  color: #2ecc71;
+  font-weight: bold;
+  font-size: 0.95rem;
+}
+
+/* Prevent hover color change on button area */
+.user-item__actions:hover {
+  background: #1f1f1f;
 }
