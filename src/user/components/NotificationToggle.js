@@ -15,20 +15,44 @@ const NotificationToggle = () => {
   const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
-    isPushEnabled().then(setEnabled);
+    // Initialize toggle based on actual subscription state
+    (async () => {
+      try {
+        const val = await isPushEnabled();
+        setEnabled(val);
+      } catch (err) {
+        console.error("Error checking push state:", err);
+        setEnabled(false);
+      }
+    })();
   }, []);
 
   const toggleHandler = async () => {
     try {
       if (enabled) {
         await unsubscribeFromPush(sendRequest, auth.token, API_URL);
-        setEnabled(false);
       } else {
+        // If notifications are denied, short-circuit and show a console hint
+        if (Notification.permission === "denied") {
+          throw new Error(
+            "Notification permission is denied in browser settings"
+          );
+        }
         await subscribeToPush(sendRequest, auth.token, API_URL);
-        setEnabled(true);
       }
     } catch (err) {
       console.error(err);
+      // Show a user-facing error so people know why subscribe failed (permission, network, etc.)
+      alert(err.message || "Push subscription failed");
+    } finally {
+      // Re-check actual state after attempt to avoid optimistic mismatches
+      try {
+        const val = await isPushEnabled();
+        setEnabled(val);
+      } catch (err) {
+        console.error("Error re-checking push state:", err);
+        setEnabled(false);
+      }
     }
   };
 

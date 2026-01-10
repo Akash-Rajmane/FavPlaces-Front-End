@@ -44,7 +44,28 @@ self.addEventListener("push", (event) => {
     },
   };
 
-  event.waitUntil(self.registration.showNotification(title, options));
+  // Avoid unhandled rejection when notifications permission is not granted
+  event.waitUntil(
+    (async () => {
+      if (
+        typeof Notification !== "undefined" &&
+        Notification.permission !== "granted"
+      ) {
+        console.warn(
+          "Push received but no notification permission granted for this origin."
+        );
+        return;
+      }
+      try {
+        await self.registration.showNotification(title, options);
+      } catch (err) {
+        console.error(
+          "showNotification failed:",
+          err && err.message ? err.message : err
+        );
+      }
+    })()
+  );
 });
 
 // -------------------------------

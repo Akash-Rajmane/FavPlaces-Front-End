@@ -76,11 +76,7 @@ const Profile = () => {
   return (
     <div className="profile-page">
       <div className="profile-card">
-        <img
-          src={auth.image || "https://via.placeholder.com/120"}
-          alt="Profile"
-          className="profile-avatar"
-        />
+        <img src={auth.image || ""} alt="Profile" className="profile-avatar" />
 
         <h2 className="profile-name">{auth.name}</h2>
         <p className="profile-email">{auth.email}</p>
