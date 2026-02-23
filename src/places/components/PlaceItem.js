@@ -37,7 +37,7 @@ const PlaceItem = (props) => {
         null,
         {
           Authorization: "Bearer " + auth.token,
-        }
+        },
       );
       props.onDelete(props.id);
     } catch (err) {

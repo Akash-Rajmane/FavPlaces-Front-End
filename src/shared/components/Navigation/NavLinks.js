@@ -8,7 +8,10 @@ const NavLinks = () => {
   return (
     <ul className="nav-links">
       <li>
-        <NavLink to="/">ALL USERS</NavLink>
+        <NavLink to="/">PLACES</NavLink>
+      </li>
+      <li>
+        <NavLink to="/users">ALL USERS</NavLink>
       </li>
       {auth.isLoggedIn && (
         <li>
