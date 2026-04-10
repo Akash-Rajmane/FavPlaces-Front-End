@@ -31,7 +31,7 @@ const Auth = () => {
         isValid: false,
       },
     },
-    false
+    false,
   );
 
   const switchModeHandler = () => {
@@ -42,7 +42,7 @@ const Auth = () => {
           name: undefined,
           image: undefined,
         },
-        formState.inputs.email.isValid && formState.inputs.password.isValid
+        formState.inputs.email.isValid && formState.inputs.password.isValid,
       );
     } else {
       setFormData(
@@ -57,7 +57,7 @@ const Auth = () => {
             isValid: false,
           },
         },
-        false
+        false,
       );
     }
     setIsLoginMode((prevMode) => !prevMode);
@@ -77,9 +77,14 @@ const Auth = () => {
           }),
           {
             "Content-Type": "application/json",
-          }
+          },
         );
-        auth.login(responseData.userId, responseData.token);
+
+        auth.login(responseData.userId, responseData.token, {
+          name: responseData.name,
+          email: responseData.email,
+          image: responseData.image,
+        });
       } catch (err) {}
     } else {
       try {
@@ -88,13 +93,18 @@ const Auth = () => {
         formData.append("name", formState.inputs.name.value);
         formData.append("password", formState.inputs.password.value);
         formData.append("image", formState.inputs.image.value);
+
         const responseData = await sendRequest(
           `${process.env.REACT_APP_BACKEND_URL}/users/signup`,
           "POST",
-          formData
+          formData,
         );
 
-        auth.login(responseData.userId, responseData.token);
+        auth.login(responseData.userId, responseData.token, {
+          name: responseData.name,
+          email: responseData.email,
+          image: responseData.image,
+        });
       } catch (err) {}
     }
   };

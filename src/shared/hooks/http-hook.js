@@ -3,12 +3,13 @@ import { useState, useCallback, useRef, useEffect } from "react";
 const useHttpClient = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState();
-
   const activeHttpRequests = useRef([]);
 
   const sendRequest = useCallback(
     async (url, method = "GET", body = null, headers = {}) => {
+      setError(null);
       setIsLoading(true);
+
       const httpAbortCtrl = new AbortController();
       activeHttpRequests.current.push(httpAbortCtrl);
 
@@ -23,7 +24,7 @@ const useHttpClient = () => {
         const responseData = await response.json();
 
         activeHttpRequests.current = activeHttpRequests.current.filter(
-          (reqCtrl) => reqCtrl !== httpAbortCtrl
+          (reqCtrl) => reqCtrl !== httpAbortCtrl,
         );
 
         if (!response.ok) {
@@ -34,15 +35,16 @@ const useHttpClient = () => {
         return responseData;
       } catch (err) {
         if (err.name === "AbortError") {
-          console.log("Request was aborted.");
-          return; // Ignore abort errors
+          setIsLoading(false);
+          return;
         }
+
         setError(err.message || "Something went wrong.");
         setIsLoading(false);
         throw err;
       }
     },
-    []
+    [],
   );
 
   const clearError = () => {
@@ -50,7 +52,6 @@ const useHttpClient = () => {
   };
 
   useEffect(() => {
-    // Cleanup abort controllers on component unmount
     return () => {
       activeHttpRequests.current.forEach((abortCtrl) => abortCtrl.abort());
     };

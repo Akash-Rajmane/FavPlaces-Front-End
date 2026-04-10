@@ -8,10 +8,8 @@ import "./Profile.css";
 const Profile = () => {
   const auth = useContext(AuthContext);
   const { sendRequest, isLoading, error } = useHttpClient();
-
   const [followRequests, setFollowRequests] = useState([]);
 
-  // 🔹 Fetch pending follow requests
   useEffect(() => {
     const fetchRequests = async () => {
       try {
@@ -21,13 +19,11 @@ const Profile = () => {
           null,
           {
             Authorization: "Bearer " + auth.token,
-          }
+          },
         );
 
-        setFollowRequests(responseData.requests);
-      } catch (err) {
-        console.error(err);
-      }
+        setFollowRequests(responseData.requests || []);
+      } catch (err) {}
     };
 
     if (auth.token) {
@@ -35,7 +31,6 @@ const Profile = () => {
     }
   }, [sendRequest, auth.token]);
 
-  // ✅ Accept follow request
   const acceptHandler = async (followId) => {
     try {
       await sendRequest(
@@ -45,16 +40,13 @@ const Profile = () => {
         {
           "Content-Type": "application/json",
           Authorization: "Bearer " + auth.token,
-        }
+        },
       );
 
       setFollowRequests((prev) => prev.filter((req) => req._id !== followId));
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) {}
   };
 
-  // ❌ Reject follow request
   const rejectHandler = async (followId) => {
     try {
       await sendRequest(
@@ -64,13 +56,11 @@ const Profile = () => {
         {
           "Content-Type": "application/json",
           Authorization: "Bearer " + auth.token,
-        }
+        },
       );
 
       setFollowRequests((prev) => prev.filter((req) => req._id !== followId));
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) {}
   };
 
   return (
@@ -78,16 +68,14 @@ const Profile = () => {
       <div className="profile-card">
         <img src={auth.image || ""} alt="Profile" className="profile-avatar" />
 
-        <h2 className="profile-name">{auth.name}</h2>
-        <p className="profile-email">{auth.email}</p>
+        <h2 className="profile-name">{auth.name || "Your Profile"}</h2>
+        <p className="profile-email">{auth.email || ""}</p>
 
-        {/* 🔔 Preferences */}
         <div className="profile-section">
           <h3>Preferences</h3>
           <NotificationToggle />
         </div>
 
-        {/* 👥 Follow Requests */}
         <div className="profile-section">
           <h3>Follow Requests</h3>
 

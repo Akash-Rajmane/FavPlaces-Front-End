@@ -22,7 +22,7 @@ const UpdatePlace = React.lazy(() => import("./places/pages/UpdatePlace"));
 const Auth = React.lazy(() => import("./user/pages/Auth"));
 
 function App() {
-  const { token, login, logout, userId } = useAuth();
+  const { token, login, logout, userId, name, email, image } = useAuth();
 
   let routes;
 
@@ -52,14 +52,18 @@ function App() {
       </Routes>
     );
   }
+
   return (
     <AuthContext.Provider
       value={{
         isLoggedIn: !!token,
-        token: token,
-        userId: userId,
-        login: login,
-        logout: logout,
+        token,
+        userId,
+        name,
+        email,
+        image,
+        login,
+        logout,
       }}
     >
       <Router>

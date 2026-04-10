@@ -11,23 +11,18 @@ import "./UserItem.css";
 const UserItem = (props) => {
   const auth = useContext(AuthContext);
   const { sendRequest } = useHttpClient();
-
-  /**
-   * followStatus values:
-   * "none" | "pending" | "accepted"
-   */
-  const [followStatus, setFollowStatus] = useState(
-    props.followStatus || "none"
-  );
+  const [followStatus, setFollowStatus] = useState(props.followStatus || "none");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isLoggedIn = !!auth.token;
   const isSelf = auth.userId === props.id;
 
-  const followHandler = async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const followHandler = async (event) => {
+    event.preventDefault();
+    event.stopPropagation();
 
     try {
+      setIsSubmitting(true);
       await sendRequest(
         `${process.env.REACT_APP_BACKEND_URL}/follow/request`,
         "POST",
@@ -35,13 +30,13 @@ const UserItem = (props) => {
         {
           "Content-Type": "application/json",
           Authorization: "Bearer " + auth.token,
-        }
+        },
       );
 
-      // ✅ Request sent, waiting for acceptance
       setFollowStatus("pending");
     } catch (err) {
-      console.error(err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -61,23 +56,22 @@ const UserItem = (props) => {
           </div>
         </Link>
 
-        {/* 🔽 FOLLOW STATE UI */}
-
-        {/* 1️⃣ NOT FOLLOWING */}
         {isLoggedIn && !isSelf && followStatus === "none" && (
           <div className="user-item__actions">
-            <button onClick={followHandler} className="follow-btn">
-              Follow
+            <button
+              onClick={followHandler}
+              className="follow-btn"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Sending..." : "Follow"}
             </button>
           </div>
         )}
 
-        {/* 2️⃣ REQUEST SENT (PENDING) */}
         {isLoggedIn && !isSelf && followStatus === "pending" && (
           <div className="user-item__actions pending">Request Sent</div>
         )}
 
-        {/* 3️⃣ FOLLOWING (ACCEPTED) */}
         {isLoggedIn && !isSelf && followStatus === "accepted" && (
           <div className="user-item__actions followed">Following</div>
         )}
