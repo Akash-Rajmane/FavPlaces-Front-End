@@ -1,0 +1,345 @@
+/* Scoped theme — matches header accent (#ff0055) and dark app shell */
+.place-search {
+  --ps-accent: #ff0055;
+  --ps-accent-hover: #ff3377;
+  --ps-accent-muted: rgba(255, 0, 85, 0.18);
+  --ps-bg: #3a3a3a;
+  --ps-surface: #2d2d2d;
+  --ps-surface-hover: #353535;
+  --ps-border: rgba(255, 255, 255, 0.08);
+  --ps-text: #f4f4f5;
+  --ps-text-muted: #a1a1aa;
+  --ps-radius-lg: 16px;
+  --ps-radius-md: 12px;
+  --ps-radius-sm: 8px;
+  --ps-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  --ps-font-display: "Open Sans", system-ui, sans-serif;
+
+  min-height: calc(100vh - 5rem);
+  padding: 1.5rem 1rem 3rem;
+  font-family: var(--ps-font-display);
+  /* Same base as body (#4d4d4d in index.css) — only a soft accent wash so the strip under the header does not shift hue */
+  background:
+    radial-gradient(
+      ellipse 120% 80% at 50% -20%,
+      rgba(255, 0, 85, 0.08),
+      transparent 52%
+    ),
+    #4d4d4d;
+  color: var(--ps-text);
+}
+
+.place-search__inner {
+  max-width: 42rem;
+  margin: 0 auto;
+}
+
+.place-search__intro {
+  text-align: center;
+  margin-bottom: 1.75rem;
+}
+
+.place-search__eyebrow {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ps-accent);
+  margin: 0 0 0.5rem;
+}
+
+.place-search__title {
+  margin: 0;
+  font-size: clamp(1.5rem, 4vw, 1.85rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--ps-text);
+}
+
+.place-search__subtitle {
+  margin: 0.65rem auto 0;
+  max-width: 28rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--ps-text-muted);
+}
+
+/* —— Search box (Algolia InstantSearch) —— */
+.place-search__search-root {
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.place-search__search-form {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  background: var(--ps-surface);
+  border-radius: var(--ps-radius-lg);
+  border: 1px solid var(--ps-border);
+  box-shadow: var(--ps-shadow);
+  overflow: hidden;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.place-search__search-form:focus-within {
+  border-color: rgba(255, 0, 85, 0.45);
+  box-shadow:
+    var(--ps-shadow),
+    0 0 0 3px var(--ps-accent-muted);
+}
+
+.place-search__search-input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.95rem 0.75rem 0.95rem 2.65rem;
+  font: inherit;
+  font-size: 1rem;
+  color: var(--ps-text);
+  background-color: transparent;
+  /* Decorative magnifier (InstantSearch uses type="search" + live refine — no submit control) */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-4.3-4.3'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 0.95rem 50%;
+  background-size: 1.1rem;
+  border: none;
+  outline: none;
+}
+
+/* Algolia sets type="search" — browsers add their own clear; we keep only Algolia's reset */
+.place-search__search-input::-webkit-search-decoration,
+.place-search__search-input::-webkit-search-cancel-button,
+.place-search__search-input::-webkit-search-results-button,
+.place-search__search-input::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
+}
+
+.place-search__search-input[type="search"]::-ms-clear,
+.place-search__search-input[type="search"]::-ms-reveal {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.place-search__search-input[type="search"]::-moz-search-clear-button {
+  display: none;
+}
+
+.place-search__search-input::placeholder {
+  color: var(--ps-text-muted);
+}
+
+/* Submit is redundant with search-as-you-type; keep it out of layout and focus order */
+.place-search__search-submit {
+  display: none !important;
+}
+
+.place-search__search-reset {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2.35rem;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  color: var(--ps-text-muted);
+  transition:
+    color 0.15s ease,
+    background 0.15s ease;
+}
+
+.place-search__search-reset:hover {
+  color: var(--ps-text);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* Match decorative magnifier in .place-search__search-input (background-size: 1.1rem) */
+.place-search__search-reset-icon {
+  width: 0.75rem !important;
+  height: 0.75rem !important;
+  display: block;
+  flex-shrink: 0;
+}
+
+/* In-bar spinner: InstantSearch "stalled" state — not needed for as-you-type search UX */
+.place-search__search-loading {
+  display: none !important;
+}
+
+/* —— Hits list —— */
+.place-search__hits {
+  background: var(--ps-bg);
+  border-radius: var(--ps-radius-lg);
+  border: 1px solid var(--ps-border);
+  box-shadow: var(--ps-shadow);
+  overflow: hidden;
+}
+
+.place-search__hits.place-search__hits--empty {
+  padding: 2.5rem 1.5rem;
+}
+
+.place-search__hits-list {
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem;
+}
+
+.place-search__hits-item {
+  padding: 0;
+  margin: 0;
+  border: none;
+}
+
+.place-search__hits-item:not(:last-child) {
+  margin-bottom: 0.5rem;
+}
+
+.place-search__empty {
+  margin: 0;
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--ps-text-muted);
+}
+
+/* —— Hit card (link) —— */
+.place-search__hit-card {
+  display: flex;
+  align-items: stretch;
+  gap: 1rem;
+  padding: 0.85rem;
+  text-decoration: none;
+  color: inherit;
+  background: var(--ps-surface);
+  border-radius: var(--ps-radius-md);
+  border: 1px solid transparent;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.15s ease;
+}
+
+.place-search__hit-card:hover {
+  background: var(--ps-surface-hover);
+  border-color: var(--ps-border);
+}
+
+.place-search__hit-card:active {
+  transform: scale(0.992);
+}
+
+.place-search__hit-media {
+  flex-shrink: 0;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: var(--ps-radius-sm);
+  overflow: hidden;
+  background: linear-gradient(
+    135deg,
+    var(--ps-accent-muted),
+    rgba(255, 255, 255, 0.06)
+  );
+  border: 1px solid var(--ps-border);
+}
+
+.place-search__hit-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.place-search__hit-media--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  opacity: 0.85;
+}
+
+.place-search__hit-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: left;
+  gap: 0.2rem;
+}
+
+.place-search__hit-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--ps-text);
+}
+
+.place-search__hit-address {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: var(--ps-text-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.place-search__hit-vibe {
+  display: inline-flex;
+  align-self: flex-start;
+  margin-top: 0.25rem;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ps-accent);
+  background: var(--ps-accent-muted);
+  border-radius: 999px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Algolia Highlight */
+.place-search__highlight-root {
+  font-weight: inherit;
+}
+
+.place-search__highlight {
+  background: none;
+  color: var(--ps-accent);
+  font-weight: inherit;
+}
+
+.place-search__highlight-muted {
+  font-weight: inherit;
+  color: inherit;
+}
+
+@media (min-width: 768px) {
+  .place-search {
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  .place-search__hit-media,
+  .place-search__hit-media--placeholder {
+    width: 5rem;
+    height: 5rem;
+  }
+
+  .place-search__hit-title {
+    font-size: 1.05rem;
+  }
+}
