@@ -14,21 +14,35 @@ const useHttpClient = () => {
       activeHttpRequests.current.push(httpAbortCtrl);
 
       try {
-        const response = await fetch(url, {
+        const finalUrl =
+          method === "GET"
+            ? `${url}${url.includes("?") ? "&" : "?"}ts=${Date.now()}`
+            : url;
+
+        const response = await fetch(finalUrl, {
           method,
           body,
-          headers,
+          headers: {
+            "Content-Type": "application/json",
+            ...headers,
+          },
           signal: httpAbortCtrl.signal,
+          cache: "no-store",
         });
 
-        const responseData = await response.json();
+        let responseData;
+        try {
+          responseData = await response.json();
+        } catch {
+          responseData = null;
+        }
 
         activeHttpRequests.current = activeHttpRequests.current.filter(
           (reqCtrl) => reqCtrl !== httpAbortCtrl,
         );
 
         if (!response.ok) {
-          throw new Error(responseData.message || "Request failed.");
+          throw new Error(responseData?.message || "Request failed.");
         }
 
         setIsLoading(false);
