@@ -1,5 +1,4 @@
 import React, { useState, useContext } from "react";
-import Card from "../../shared/components/UIElements/Card";
 import Input from "../../shared/components/FormElements/Input";
 import Button from "../../shared/components/FormElements/Button";
 import ImageUpload from "../../shared/components/FormElements/ImageUpload";
@@ -112,51 +111,64 @@ const Auth = () => {
   return (
     <React.Fragment>
       <ErrorModal error={error} onClear={clearError} />
-      <Card className="authentication">
-        {isLoading && <LoadingSpinner asOverlay />}
-        <h2>{isLoginMode ? "Login" : "Signup"}</h2>
-        <hr />
-        <form onSubmit={authSubmitHandler}>
-          {!isLoginMode && (
-            <Input
-              element="input"
-              id="name"
-              type="text"
-              label="Your Name"
-              validators={[VALIDATOR_REQUIRE()]}
-              errorText="Please enter a valid name"
-              onInput={inputHandler}
-            />
-          )}
-          {!isLoginMode && (
-            <ImageUpload id="image" center onInput={inputHandler} />
-          )}
-          <Input
-            element="input"
-            id="email"
-            type="email"
-            label="E-mail"
-            validators={[VALIDATOR_EMAIL()]}
-            errorText="Please enter a valid email address."
-            onInput={inputHandler}
-          />
-          <Input
-            element="input"
-            id="password"
-            type="password"
-            label="Password"
-            validators={[VALIDATOR_MINLENGTH(8)]}
-            errorText="Please enter a valid password, at least 8 characters."
-            onInput={inputHandler}
-          />
-          <Button type="submit" disabled={!formState.isValid}>
-            {isLoginMode ? "LOGIN" : "SIGNUP"}
-          </Button>
-        </form>
-        <Button inverse onClick={switchModeHandler}>
-          SWITCH TO {!isLoginMode ? "LOGIN" : "SIGNUP"}
-        </Button>
-      </Card>
+      <div className="auth-page">
+        <div className={`auth__visual ${isLoginMode ? 'login-mode' : 'signup-mode'}`}>
+          <div className="auth__visual-content">
+            <h1>{isLoginMode ? "Welcome back." : "Join FavPlaces."}</h1>
+            <p>{isLoginMode ? "Discover new destinations." : "Share your favorite hidden gems with the world."}</p>
+          </div>
+        </div>
+        
+        <div className="auth__form-container">
+          <div className="auth__form-card">
+            {isLoading && <LoadingSpinner asOverlay />}
+            <h2>{isLoginMode ? "Sign In" : "Create Account"}</h2>
+            <form onSubmit={authSubmitHandler}>
+              {!isLoginMode && (
+                <div className="auth__slide-in">
+                  <Input
+                    element="input"
+                    id="name"
+                    type="text"
+                    label="Your Name"
+                    validators={[VALIDATOR_REQUIRE()]}
+                    errorText="Please enter a valid name"
+                    onInput={inputHandler}
+                  />
+                  <ImageUpload id="image" center onInput={inputHandler} />
+                </div>
+              )}
+              <Input
+                element="input"
+                id="email"
+                type="email"
+                label="E-mail"
+                validators={[VALIDATOR_EMAIL()]}
+                errorText="Please enter a valid email address."
+                onInput={inputHandler}
+              />
+              <Input
+                element="input"
+                id="password"
+                type="password"
+                label="Password"
+                validators={[VALIDATOR_MINLENGTH(8)]}
+                errorText="Please enter a valid password, at least 8 characters."
+                onInput={inputHandler}
+              />
+              <Button type="submit" disabled={!formState.isValid} className="auth__submit-btn">
+                {isLoginMode ? "SIGN IN" : "SIGN UP"}
+              </Button>
+            </form>
+            <div className="auth__switch">
+              <span>{isLoginMode ? "Don't have an account?" : "Already have an account?"}</span>
+              <button className="auth__switch-btn" type="button" onClick={switchModeHandler}>
+                {isLoginMode ? "Sign Up" : "Sign In"}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </React.Fragment>
   );
 };

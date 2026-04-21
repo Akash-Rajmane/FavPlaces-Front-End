@@ -2,10 +2,11 @@ import { liteClient as algoliasearch } from "algoliasearch/lite";
 import {
   InstantSearch,
   SearchBox,
-  Hits,
+  useHits,
   Highlight,
 } from "react-instantsearch";
 import { Link } from "react-router-dom";
+import Masonry from "react-masonry-css";
 import "./PlaceSearch.css";
 
 const searchClient = algoliasearch(
@@ -21,13 +22,6 @@ const searchBoxClassNames = {
   reset: "place-search__search-reset",
   resetIcon: "place-search__search-reset-icon",
   loadingIndicator: "place-search__search-loading",
-};
-
-const hitsClassNames = {
-  root: "place-search__hits",
-  emptyRoot: "place-search__hits place-search__hits--empty",
-  list: "place-search__hits-list",
-  item: "place-search__hits-item",
 };
 
 const highlightClassNames = {
@@ -70,11 +64,35 @@ function Hit({ hit }) {
   );
 }
 
-function EmptyHits() {
+function CustomHits(props) {
+  const { hits } = useHits(props);
+  const breakpointColumnsObj = {
+    default: 3,
+    1024: 3,
+    768: 2,
+    500: 1
+  };
+  
+  if (hits.length === 0) {
+    return (
+      <p className="place-search__empty">
+        No places match your search. Try another name or neighborhood.
+      </p>
+    );
+  }
+
   return (
-    <p className="place-search__empty">
-      No places match your search. Try another name or neighborhood.
-    </p>
+    <div className="place-search__hits">
+      <Masonry
+        breakpointCols={breakpointColumnsObj}
+        className="place-search-masonry"
+        columnClassName="place-search-masonry_column"
+      >
+        {hits.map(hit => (
+          <Hit key={hit.objectID} hit={hit} />
+        ))}
+      </Masonry>
+    </div>
   );
 }
 
@@ -99,11 +117,7 @@ export default function PlaceSearch() {
             placeholder="Search by name, area, or vibe…"
             classNames={searchBoxClassNames}
           />
-          <Hits
-            hitComponent={Hit}
-            classNames={hitsClassNames}
-            emptyComponent={EmptyHits}
-          />
+          <CustomHits />
         </InstantSearch>
       </div>
     </div>

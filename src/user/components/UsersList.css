@@ -1,10 +1,31 @@
-.users-list {
-  list-style: none;
+.users-gallery-wall {
+  width: 100%;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0;
-  width: 90%;
-  max-width: 50rem;
+  padding: 3rem 2rem;
+  /* Subtle wallpaper/gallery wall texture */
+  background-color: var(--color-bg);
+  background-image: 
+    radial-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+    radial-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-position: 0 0, 10px 10px;
+  min-height: calc(100vh - 5rem);
+}
+
+.users-masonry-grid {
   display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
+  margin-left: -3rem; /* gutter size offset */
+  width: auto;
+}
+
+.users-masonry-grid_column {
+  padding-left: 3rem; /* gutter size */
+  background-clip: padding-box;
+}
+
+.users-masonry-grid_column > li,
+.users-masonry-grid_column > div {
+  margin-bottom: 4rem; /* large space between paintings */
+  list-style: none;
 }

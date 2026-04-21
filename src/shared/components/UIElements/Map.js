@@ -17,9 +17,13 @@ const Map = (props) => {
       const map = new window.google.maps.Map(mapRef.current, {
         center: center,
         zoom: zoom,
+        mapId: "DEMO_MAP_ID", // Required for AdvancedMarkerElement
       });
 
-      new window.google.maps.Marker({ position: center, map: map });
+      new window.google.maps.marker.AdvancedMarkerElement({ 
+        position: center, 
+        map: map 
+      });
     }
   }, [scriptLoaded, center, zoom]);
 

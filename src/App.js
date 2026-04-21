@@ -16,6 +16,7 @@ import PlaceDetail from "./places/pages/PlaceDetail";
 const Profile = React.lazy(() => import("./user/pages/Profile"));
 const Notifications = React.lazy(() => import("./user/pages/Notifications"));
 const Users = React.lazy(() => import("./user/pages/Users"));
+const Connections = React.lazy(() => import("./user/pages/Connections"));
 const NewPlace = React.lazy(() => import("./places/pages/NewPlace"));
 const UserPlaces = React.lazy(() => import("./places/pages/UserPlaces"));
 const UpdatePlace = React.lazy(() => import("./places/pages/UpdatePlace"));
@@ -32,6 +33,7 @@ function App() {
         <Route path="/" element={<Places />} />
         <Route path="/users" element={<Users />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/network" element={<Connections />} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/:userId/places" element={<UserPlaces />} />
         <Route path="/places/new" element={<NewPlace />} />

@@ -20,7 +20,7 @@ const UpdatePlace = () => {
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
   const [loadedPlace, setLoadedPlace] = useState(null);
   const placeId = useParams().placeId;
-  const naviagte = useNavigate();
+  const navigate = useNavigate();
 
   const [formState, inputHandler, setFormData] = useForm(
     {
@@ -77,7 +77,7 @@ const UpdatePlace = () => {
           Authorization: "Bearer " + auth.token,
         }
       );
-      naviagte("/" + auth.userId + "/places");
+      navigate("/" + auth.userId + "/places");
     } catch (err) {
       console.log(err);
     }
@@ -105,32 +105,41 @@ const UpdatePlace = () => {
     <React.Fragment>
       <ErrorModal error={error} onClear={clearError} />
       {!isLoading && loadedPlace && (
-        <form className="place-form" onSubmit={placeUpdateSubmitHandler}>
-          <Input
-            id="title"
-            element="input"
-            type="text"
-            label="Title"
-            validators={[VALIDATOR_REQUIRE()]}
-            errorText="Please enter a valid title."
-            onInput={inputHandler}
-            initialValue={loadedPlace.title}
-            initialValid={true}
-          />
-          <Input
-            id="description"
-            element="textarea"
-            label="Description"
-            validators={[VALIDATOR_MINLENGTH(5)]}
-            errorText="Please enter a valid description (min. 5 characters)."
-            onInput={inputHandler}
-            initialValue={loadedPlace.description}
-            initialValid={true}
-          />
-          <Button type="submit" disabled={!formState.isValid}>
-            UPDATE PLACE
-          </Button>
-        </form>
+        <div className="update-place-page">
+          <form className="place-form" onSubmit={placeUpdateSubmitHandler}>
+            <h2>Edit Place</h2>
+            <Input
+              id="title"
+              element="input"
+              type="text"
+              label="Title"
+              validators={[VALIDATOR_REQUIRE()]}
+              errorText="Please enter a valid title."
+              onInput={inputHandler}
+              initialValue={loadedPlace.title}
+              initialValid={true}
+            />
+            <Input
+              id="description"
+              element="textarea"
+              rows={6}
+              label="Description"
+              validators={[VALIDATOR_MINLENGTH(5)]}
+              errorText="Please enter a valid description (min. 5 characters)."
+              onInput={inputHandler}
+              initialValue={loadedPlace.description}
+              initialValid={true}
+            />
+            <div className="form-actions">
+              <Button type="button" inverse onClick={() => navigate(-1)}>
+                CANCEL
+              </Button>
+              <Button type="submit" disabled={!formState.isValid}>
+                UPDATE PLACE
+              </Button>
+            </div>
+          </form>
+        </div>
       )}
     </React.Fragment>
   );

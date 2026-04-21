@@ -1,0 +1,31 @@
+.place-form {
+  list-style: none;
+  margin: 4rem auto;
+  padding: 3rem 2rem;
+  width: 90%;
+  max-width: 40rem;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--color-border);
+  animation: fade-slide-up 0.4s ease-out forwards;
+}
+
+@keyframes fade-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.place-form h2 {
+  font-weight: 700;
+  color: var(--color-text-main);
+  margin-bottom: 2rem;
+  font-size: 1.75rem;
+  text-align: center;
+}

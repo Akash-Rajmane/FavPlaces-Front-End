@@ -1,0 +1,132 @@
+.connections-page {
+  max-width: 1000px;
+  margin: 3rem auto;
+  padding: 0 1rem;
+  animation: fade-in 0.4s ease-out forwards;
+}
+
+.connections-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+  color: var(--color-text-main);
+  letter-spacing: -0.5px;
+}
+
+.connections-tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid var(--color-border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.connections-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.connections-tabs button {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  position: relative;
+  transition: color var(--transition-fast);
+  white-space: nowrap;
+}
+
+.connections-tabs button.active {
+  color: var(--color-primary);
+}
+
+.connections-tabs button.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--color-primary);
+}
+
+.connections-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.connection-item__content {
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.connection-item__content:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.connection-item__link {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.connection-item__image {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.connection-item__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: var(--color-surface);
+}
+
+.connection-item__info h2 {
+  font-size: 1.15rem;
+  margin: 0 0 0.25rem 0;
+  color: var(--color-text-main);
+}
+
+.connection-item__info h3 {
+  font-size: 0.9rem;
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.connection-item__actions {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
+  text-align: center;
+}
+
+.connection-item__actions button {
+  width: 100%;
+  padding: 0.5rem;
+}
+
+.connections-empty {
+  font-size: 1.1rem;
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: 3rem 0;
+}

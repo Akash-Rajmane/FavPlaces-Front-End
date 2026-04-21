@@ -1,9 +1,9 @@
 import React from "react";
-
 import Card from "../../shared/components/UIElements/Card";
 import PlaceItem from "./PlaceItem";
-import "./PlaceList.css";
 import Button from "../../shared/components/FormElements/Button";
+import Masonry from "react-masonry-css";
+import "./PlaceList.css";
 
 const PlaceList = (props) => {
   if (props.items.length === 0) {
@@ -17,25 +17,29 @@ const PlaceList = (props) => {
     );
   }
 
+  const breakpointColumnsObj = {
+    default: 3,
+    1024: 3,
+    768: 2,
+    500: 1
+  };
+
   return (
-    <ul className="place-list">
+    <Masonry
+      breakpointCols={breakpointColumnsObj}
+      className="place-list-masonry"
+      columnClassName="place-list-masonry_column"
+    >
       {props.items.map((place) => (
         <PlaceItem
           key={place._id}
           id={place._id}
           image={place.image}
           title={place.title}
-          description={place.description}
-          address={place.address}
           creatorId={place.creator}
-          coordinates={{
-            lng: place.location_geo.coordinates[0],
-            lat: place.location_geo.coordinates[1],
-          }}
-          onDelete={props.onDeletePlace}
         />
       ))}
-    </ul>
+    </Masonry>
   );
 };
 

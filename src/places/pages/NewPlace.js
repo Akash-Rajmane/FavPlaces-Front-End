@@ -67,43 +67,58 @@ const NewPlace = () => {
   return (
     <React.Fragment>
       <ErrorModal error={error} onClear={clearError} />
-      <form className="place-form" onSubmit={placeSubmitHandler}>
-        {isLoading && <LoadingSpinner asOverlay />}
-        <Input
-          id="title"
-          element="input"
-          type="text"
-          label="Title"
-          validators={[VALIDATOR_REQUIRE()]}
-          errorText="Please enter a valid title."
-          onInput={inputHandler}
-        />
-        <Input
-          id="description"
-          element="textarea"
-          label="Description"
-          validators={[VALIDATOR_MINLENGTH(5)]}
-          errorText="Please enter a valid description (at least 5 characters)."
-          onInput={inputHandler}
-        />
-        <Input
-          id="address"
-          element="input"
-          label="Address"
-          validators={[VALIDATOR_REQUIRE()]}
-          errorText="Please enter a valid address."
-          onInput={inputHandler}
-        />
-        <ImageUpload
-          id="image"
-          onInput={inputHandler}
-          errorText={"Please provide an image"}
-          center
-        />
-        <Button type="submit" disabled={!formState.isValid}>
-          ADD PLACE
-        </Button>
-      </form>
+      <div className="new-place-page">
+        <div className="new-place__visual">
+          <h1>Catalog a new destination</h1>
+          <p>Share your favorite hidden gems, local spots, and scenic views with the community.</p>
+        </div>
+        <div className="new-place__form-container">
+          <form className="place-form" onSubmit={placeSubmitHandler}>
+            {isLoading && <LoadingSpinner asOverlay />}
+            <h2>Add Place</h2>
+            <Input
+              id="title"
+              element="input"
+              type="text"
+              label="Title"
+              validators={[VALIDATOR_REQUIRE()]}
+              errorText="Please enter a valid title."
+              onInput={inputHandler}
+            />
+            <Input
+              id="description"
+              element="textarea"
+              rows={6}
+              label="Description"
+              validators={[VALIDATOR_MINLENGTH(5)]}
+              errorText="Please enter a valid description (at least 5 characters)."
+              onInput={inputHandler}
+            />
+            <Input
+              id="address"
+              element="input"
+              label="Address"
+              validators={[VALIDATOR_REQUIRE()]}
+              errorText="Please enter a valid address."
+              onInput={inputHandler}
+            />
+            <ImageUpload
+              id="image"
+              onInput={inputHandler}
+              errorText={"Please provide an image"}
+              center
+            />
+            <div className="form-actions">
+              <Button type="button" inverse onClick={() => navigate(-1)}>
+                CANCEL
+              </Button>
+              <Button type="submit" disabled={!formState.isValid}>
+                ADD PLACE
+              </Button>
+            </div>
+          </form>
+        </div>
+      </div>
     </React.Fragment>
   );
 };

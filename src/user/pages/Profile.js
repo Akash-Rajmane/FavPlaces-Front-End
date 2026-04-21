@@ -2,6 +2,8 @@ import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../shared/context/auth-context";
 import NotificationToggle from "../components/NotificationToggle";
 import useHttpClient from "../../shared/hooks/http-hook";
+import Avatar from "../../shared/components/UIElements/Avatar";
+import Card from "../../shared/components/UIElements/Card";
 
 import "./Profile.css";
 
@@ -64,52 +66,72 @@ const Profile = () => {
   };
 
   return (
-    <div className="profile-page">
-      <div className="profile-card">
-        <img src={auth.image || ""} alt="Profile" className="profile-avatar" />
-
-        <h2 className="profile-name">{auth.name || "Your Profile"}</h2>
-        <p className="profile-email">{auth.email || ""}</p>
-
-        <div className="profile-section">
-          <h3>Preferences</h3>
-          <NotificationToggle />
+    <div className="profile-dashboard">
+      <div className="profile-header-card">
+        <div className="profile-cover"></div>
+        <div className="profile-header-info">
+          <div className="profile-avatar-wrapper">
+            <Avatar image={auth.image || ""} alt={auth.name || "Profile"} />
+          </div>
+          <div className="profile-text-info">
+            <h2>{auth.name || "Your Profile"}</h2>
+            <p>{auth.email || ""}</p>
+          </div>
         </div>
-
-        <div className="profile-section">
-          <h3>Follow Requests</h3>
-
-          {isLoading && <p>Loading...</p>}
-
-          {!isLoading && followRequests.length === 0 && (
-            <p>No pending requests</p>
-          )}
-
-          {!isLoading &&
-            followRequests.map((req) => (
-              <div key={req._id} className="follow-request-item">
-                <span>{req.follower.name}</span>
-
-                <div className="follow-actions">
-                  <button
-                    className="accept-btn"
-                    onClick={() => acceptHandler(req._id)}
-                  >
-                    Accept
-                  </button>
-                  <button
-                    className="reject-btn"
-                    onClick={() => rejectHandler(req._id)}
-                  >
-                    Reject
-                  </button>
-                </div>
-              </div>
-            ))}
-        </div>
-
-        {error && <p className="error-text">{error}</p>}
       </div>
+
+      <div className="profile-grid">
+        <div className="profile-column">
+          <Card className="profile-card-section">
+            <h3>Preferences</h3>
+            <NotificationToggle />
+          </Card>
+        </div>
+
+        <div className="profile-column">
+          <Card className="profile-card-section">
+            <h3>Follow Requests</h3>
+
+            {isLoading && <p className="profile-muted-text">Loading requests...</p>}
+
+            {!isLoading && followRequests.length === 0 && (
+              <p className="profile-muted-text">No pending follow requests.</p>
+            )}
+
+            {!isLoading && followRequests.length > 0 && (
+              <ul className="follow-requests-list">
+                {followRequests.map((req) => (
+                  <li key={req._id} className="follow-request-item">
+                    <div className="follow-request-user">
+                      <div className="follow-request-avatar">
+                        <Avatar image={req.follower.image} alt={req.follower.name} />
+                      </div>
+                      <span>{req.follower.name}</span>
+                    </div>
+
+                    <div className="follow-actions">
+                      <button
+                        className="accept-btn"
+                        onClick={() => acceptHandler(req._id)}
+                      >
+                        Accept
+                      </button>
+                      <button
+                        className="reject-btn"
+                        onClick={() => rejectHandler(req._id)}
+                      >
+                        Reject
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Card>
+        </div>
+      </div>
+
+      {error && <p className="error-text">{error}</p>}
     </div>
   );
 };

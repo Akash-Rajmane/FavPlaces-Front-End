@@ -19,11 +19,17 @@ const useHttpClient = () => {
             ? `${url}${url.includes("?") ? "&" : "?"}ts=${Date.now()}`
             : url;
 
+        const isFormData = body instanceof FormData;
+        const defaultHeaders = {};
+        if (body && !isFormData) {
+          defaultHeaders["Content-Type"] = "application/json";
+        }
+
         const response = await fetch(finalUrl, {
           method,
           body,
           headers: {
-            "Content-Type": "application/json",
+            ...defaultHeaders,
             ...headers,
           },
           signal: httpAbortCtrl.signal,

@@ -5,7 +5,11 @@ import "./LoadingSpinner.css";
 const LoadingSpinner = (props) => {
   return (
     <div className={`${props.asOverlay && "loading-spinner__overlay"}`}>
-      <div className="lds-dual-ring"></div>
+      <div className="modern-dots-loader">
+        <div className="dot"></div>
+        <div className="dot"></div>
+        <div className="dot"></div>
+      </div>
     </div>
   );
 };

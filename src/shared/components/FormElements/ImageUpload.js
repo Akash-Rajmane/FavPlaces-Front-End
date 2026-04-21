@@ -9,6 +9,7 @@ const ImageUpload = (props) => {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [isValid, setIsValid] = useState(false);
   const [isTakingPicture, setIsTakingPicture] = useState(false);
+  const [cameraError, setCameraError] = useState(null);
   const [stream, setStream] = useState(null);
   const cameraFacingRef = useRef("user"); // default front camera
   const [isMobile, setIsMobile] = useState(false); // State to check if the user is on mobile
@@ -97,20 +98,41 @@ const ImageUpload = (props) => {
     filePickerRef.current.click();
   };
 
-  // Handle camera access for taking a picture with backward compatibility
   const takePictureHandler = async () => {
+    setCameraError(null);
     setIsTakingPicture(true);
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: { exact: cameraFacingRef.current }, // Select front or back camera
+          facingMode: cameraFacingRef.current === "user" ? "user" : "environment",
         },
       });
-      videoRef.current.srcObject = mediaStream;
       setStream(mediaStream);
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = mediaStream;
+        }
+      }, 50);
     } catch (err) {
       console.error("Error accessing the camera", err);
-      setIsTakingPicture(false);
+      // Fallback for desktop browsers that don't support facingMode well
+      try {
+        const fallbackStream = await navigator.mediaDevices.getUserMedia({ video: true });
+        setStream(fallbackStream);
+        setTimeout(() => {
+          if (videoRef.current) {
+            videoRef.current.srcObject = fallbackStream;
+          }
+        }, 50);
+      } catch (fallbackErr) {
+        console.error("Fallback camera access failed", fallbackErr);
+        setIsTakingPicture(false);
+        setCameraError(
+          fallbackErr.name === "AbortError" || fallbackErr.message.includes("Timeout")
+            ? "Camera timeout: Please ensure your camera is connected and not currently being used by another application (like Zoom/Teams)."
+            : "Could not access the camera. Please check your browser permissions or hardware."
+        );
+      }
     }
   };
 
@@ -203,41 +225,27 @@ const ImageUpload = (props) => {
           ) : previewUrl ? (
             <img src={previewUrl} alt="Preview" />
           ) : (
-            <p>Please pick an image or take a picture.</p>
+            <p>Select an image or take a picture.</p>
           )}
         </div>
         {/* Conditionally render the "Pick Image" and "Take Picture" buttons only if no file is selected & while not taking picture  */}
         {!isTakingPicture && !file && (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "10px",
-              marginBottom: "10px",
-            }}
-          >
-            <Button type="button" onClick={pickImageHandler}>
+          <div className="image-upload__actions">
+            <Button type="button" inverse onClick={pickImageHandler}>
               PICK IMAGE
             </Button>
-            <Button type="button" onClick={takePictureHandler}>
+            <Button type="button" inverse onClick={takePictureHandler}>
               TAKE PICTURE
             </Button>
           </div>
         )}
         {/* Show the "Capture" and "Switch Camera" buttons when taking a picture */}
         {isTakingPicture && (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "10px",
-              marginBottom: "10px",
-            }}
-          >
+          <div className="image-upload__actions">
             <Button type="button" onClick={captureImageHandler}>
               <img
                 src={CameraIcon}
-                alt="switch camera"
+                alt="capture camera"
                 width={"20px"}
                 height={"20px"}
               />
@@ -255,14 +263,17 @@ const ImageUpload = (props) => {
           </div>
         )}
         {file && (
-          <Button type="button" onClick={resetHandler}>
-            RESET
-          </Button>
+          <div className="image-upload__actions">
+            <Button type="button" danger onClick={resetHandler}>
+              RESET IMAGE
+            </Button>
+          </div>
         )}
         <canvas ref={canvasRef} style={{ display: "none" }} />
       </div>
 
-      {!isValid && <p>{props.errorText}</p>}
+      {!isValid && !cameraError && <p>{props.errorText}</p>}
+      {cameraError && <p style={{ color: "#DC2626", fontWeight: "500", marginTop: "0.5rem" }}>{cameraError}</p>}
     </div>
   );
 };
