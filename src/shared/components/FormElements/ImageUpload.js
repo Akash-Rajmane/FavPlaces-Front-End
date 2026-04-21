@@ -101,37 +101,32 @@ const ImageUpload = (props) => {
   const takePictureHandler = async () => {
     setCameraError(null);
     setIsTakingPicture(true);
+    
     try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: cameraFacingRef.current === "user" ? "user" : "environment",
-        },
-      });
+      // 1. More flexible constraints
+      const constraints = {
+        video: isMobile 
+          ? { facingMode: cameraFacingRef.current } // Suggest, don't demand "exact"
+          : true,
+      };
+
+      const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+      
+      if (videoRef.current) {
+        videoRef.current.srcObject = mediaStream;
+        // 2. Explicitly call play() to ensure the stream starts
+        videoRef.current.play().catch(e => console.error("Error playing video:", e));
+      }
       setStream(mediaStream);
-      setTimeout(() => {
-        if (videoRef.current) {
-          videoRef.current.srcObject = mediaStream;
-        }
-      }, 50);
     } catch (err) {
       console.error("Error accessing the camera", err);
-      // Fallback for desktop browsers that don't support facingMode well
-      try {
-        const fallbackStream = await navigator.mediaDevices.getUserMedia({ video: true });
-        setStream(fallbackStream);
-        setTimeout(() => {
-          if (videoRef.current) {
-            videoRef.current.srcObject = fallbackStream;
-          }
-        }, 50);
-      } catch (fallbackErr) {
-        console.error("Fallback camera access failed", fallbackErr);
-        setIsTakingPicture(false);
-        setCameraError(
-          fallbackErr.name === "AbortError" || fallbackErr.message.includes("Timeout")
-            ? "Camera timeout: Please ensure your camera is connected and not currently being used by another application (like Zoom/Teams)."
-            : "Could not access the camera. Please check your browser permissions or hardware."
-        );
+      setIsTakingPicture(false);
+      
+      // 3. Specific error handling
+      if (err.name === 'NotAllowedError') {
+        setCameraError("Permission denied. Please allow camera access in your browser settings.");
+      } else {
+        setCameraError("Could not access the camera. It might be in use by another app or timing out.");
       }
     }
   };
@@ -139,6 +134,14 @@ const ImageUpload = (props) => {
   const captureImageHandler = () => {
     const canvas = canvasRef.current;
     const video = videoRef.current;
+
+    // Safety check: Prevent capture if video stream hasn't initialized or failed
+    if (!video || !stream || video.videoWidth === 0 || video.videoHeight === 0) {
+      console.error("Video feed not ready for capture");
+      setCameraError("Camera feed is not ready yet. Please wait a second.");
+      return;
+    }
+
     const context = canvas.getContext("2d");
 
     // Set canvas width and height to the video resolution for better quality
@@ -155,6 +158,7 @@ const ImageUpload = (props) => {
     canvas.toBlob((blob) => {
       if (!blob) {
         console.error("Failed to create blob from canvas");
+        setCameraError("Failed to capture image. Please try again.");
         return;
       }
 
@@ -171,6 +175,7 @@ const ImageUpload = (props) => {
       setFile(capturedfile);
       setPreviewUrl(URL.createObjectURL(capturedfile));
       setIsValid(true);
+      setCameraError(null);
 
       // Pass the file to the onInput function
       props.onInput(props.id, capturedfile, true);
@@ -221,7 +226,13 @@ const ImageUpload = (props) => {
         <div className="image-upload__preview">
           {/* Show video if taking picture, otherwise show image preview */}
           {isTakingPicture ? (
-            <video ref={videoRef} autoPlay style={{ width: "100%" }} />
+            <video 
+              ref={videoRef} 
+              autoPlay 
+              playsInline // Critical for iOS/Mobile Safari
+              onLoadedMetadata={() => setCameraError(null)} 
+              style={{ width: "100%" }} 
+            />
           ) : previewUrl ? (
             <img src={previewUrl} alt="Preview" />
           ) : (
