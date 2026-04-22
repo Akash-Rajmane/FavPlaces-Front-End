@@ -8,10 +8,10 @@ const NavLinks = () => {
   return (
     <ul className="nav-links">
       <li>
-        <NavLink to="/">PLACES</NavLink>
+        <NavLink to="/">Places</NavLink>
       </li>
       <li>
-        <NavLink to="/users">ALL USERS</NavLink>
+        <NavLink to="/users">All Users</NavLink>
       </li>
       {auth.isLoggedIn && (
         <li>
@@ -30,7 +30,7 @@ const NavLinks = () => {
       )}
       {!auth.isLoggedIn && (
         <li>
-          <NavLink to="/auth">AUTHENTICATE</NavLink>
+          <NavLink to="/auth">Authenticate</NavLink>
         </li>
       )}
       {auth.isLoggedIn && (
@@ -45,7 +45,7 @@ const NavLinks = () => {
       )}
       {auth.isLoggedIn && (
         <li>
-          <button onClick={auth.logout}>LOGOUT</button>
+          <button onClick={auth.logout}>Logout</button>
         </li>
       )}
     </ul>
