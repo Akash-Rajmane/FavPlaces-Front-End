@@ -72,11 +72,11 @@ function CustomHits(props) {
     768: 2,
     500: 1
   };
-  
+
   if (hits.length === 0) {
     return (
       <p className="place-search__empty">
-        No places match your search. Try another name or neighborhood.
+        No places found.
       </p>
     );
   }
