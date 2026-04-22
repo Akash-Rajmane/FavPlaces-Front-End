@@ -36,13 +36,18 @@ const MainNavigation = (props) => {
           <span />
         </button>
         <h1 className="main-navigation__title">
-          <Link to="/">FavPlaces</Link>
+          <Link to="/" style={{
+            display: 'flex', alignItems: 'center'
+          }}>
+            <img src="/favplaces.png" alt="FavPlaces Logo" style={{ width: '2.5rem', height: '2.5rem', objectFit: 'contain' }} />
+            FavPlaces
+          </Link>
         </h1>
         <nav className="main-navigation__header-nav">
           <NavLinks />
         </nav>
       </MainHeader>
-    </React.Fragment>
+    </React.Fragment >
   );
 };
 
