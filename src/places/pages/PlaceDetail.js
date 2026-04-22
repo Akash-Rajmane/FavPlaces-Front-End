@@ -95,7 +95,11 @@ const PlaceDetail = () => {
 
       <div className="place-detail-page">
         <div className="place-detail__hero">
-          <img src={loadedPlace.image} alt={loadedPlace.title} />
+          <div className="place-detail__painting-frame">
+            <div className="place-detail__painting-mat">
+              <img src={loadedPlace.image} alt={loadedPlace.title} className="place-detail__painting-image" />
+            </div>
+          </div>
         </div>
         
         <div className="place-detail__content">
