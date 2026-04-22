@@ -1,86 +1,70 @@
-### Hosted Link: https://fav-places.vercel.app
+# FavPlaces (Client)
 
+A modern, full-stack application that allows users to discover, share, and manage their favorite places, complete with maps, images, and vibes. 
+
+### Hosted Link: https://fav-places.vercel.app
 ### BackEnd Repo: https://github.com/Akash-Rajmane/FavPlaces-Back-End
 
-### Technical Stack Used: ReactJS, HTML, CSS, JavaScript, React-Router-Dom, NodeJS, ExpressJS, MongoDB, JWT Authentication, Google Maps API
+---
 
-### Features:
+## 🚀 Features
 
-#### ◾️User signup, login and logout.
+*   **Modern, Premium UI:** A fully responsive, design-system-driven interface featuring glassmorphism, dynamic micro-animations, and a responsive Pinterest-style masonry grid layout.
+*   **Authentication & Security:** Secure user signup, login, and logout using JWT authentication.
+*   **Place Discovery:** Lightning-fast, full-text semantic search and filtering powered by **Algolia InstantSearch**. Search by name, area, or vibe.
+*   **Social Connections & Notifications:** View other users' profiles, see their saved places, follow/connect with them, and receive in-app notifications.
+*   **Interactive Maps:** Automatic map rendering using the **Google Maps API** when an address is provided.
+*   **Place Management:** Create, edit, and delete personal favorite places with image uploads and customized descriptions.
 
-#### ◾️User can Add, Edit, Delete places.
+## 🛠 Technical Stack
 
-#### ◾️User can see other users and their saved places.
+*   **Frontend Framework:** ReactJS, HTML5, CSS3 (Custom Design System with CSS variables)
+*   **Routing:** React-Router-Dom (v6)
+*   **Search Engine:** Algolia & React InstantSearch
+*   **Layouts:** React Masonry CSS
+*   **Backend API:** NodeJS, ExpressJS, MongoDB (Mongoose)
+*   **Integrations:** Google Maps API
 
-#### ◾️Automatic generation of map on inputting address.
+---
 
-# Getting Started with Create React App
+## 💻 Getting Started
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+### Prerequisites
+Make sure you have Node.js installed on your machine. You will also need your own API keys for Google Maps and Algolia to enable map and search functionality.
+
+### Installation
+
+1. Clone the repository and navigate to the `client` directory:
+   ```bash
+   cd client
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Create a `.env` file in the root of the `client` directory and add your environment variables:
+   ```env
+   REACT_APP_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
+   REACT_APP_ALGOLIA_APP_ID=your_algolia_app_id
+   REACT_APP_ALGOLIA_SEARCH_ONLY_KEY=your_algolia_search_only_key
+   ```
+
+### Available Scripts
 
 In the project directory, you can run:
 
-### `npm start`
+#### `npm start`
+Runs the app in the development mode.
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser. The page will reload when you make changes.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+#### `npm run build`
+Builds the app for production to the `build` folder. It correctly bundles React in production mode and optimizes the build for the best performance. The build is minified and the filenames include the hashes.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+---
 
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## 🎨 Design System
+The UI has been thoroughly modernized using pure CSS. It utilizes a central variable system in `index.css` to manage themes, colors, border-radii, and typography. No external UI component libraries like Tailwind or Material-UI were used, ensuring a fully custom and lightweight footprint.
