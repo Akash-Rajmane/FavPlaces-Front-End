@@ -6,6 +6,7 @@ import Map from "../../shared/components/UIElements/Map";
 import Button from "../../shared/components/FormElements/Button";
 import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
 import Modal from "../../shared/components/UIElements/Modal";
+import AIPlaceAssistant from "../../shared/components/UIElements/AIPlaceAssistant";
 import "./PlaceDetail.css";
 
 const PlaceDetail = () => {
@@ -133,6 +134,11 @@ const PlaceDetail = () => {
               />
             </div>
           )}
+
+          <AIPlaceAssistant
+            place={loadedPlace}
+            token={auth.token}
+          />
         </div>
       </div>
     </React.Fragment>

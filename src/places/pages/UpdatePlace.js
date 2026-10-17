@@ -13,6 +13,7 @@ import {
 import useForm from "../../shared/hooks/form-hook";
 import useHttpClient from "../../shared/hooks/http-hook";
 import { AuthContext } from "../../shared/context/auth-context";
+import AIDescriptionPolish from "../../shared/components/UIElements/AIDescriptionPolish";
 import "./PlaceForm.css";
 
 const UpdatePlace = () => {
@@ -83,6 +84,10 @@ const UpdatePlace = () => {
     }
   };
 
+  const applyPolishedDescriptionHandler = (polishedText) => {
+    inputHandler("description", polishedText, polishedText.length >= 5);
+  };
+
   if (isLoading) {
     return (
       <div className="center">
@@ -117,6 +122,7 @@ const UpdatePlace = () => {
               errorText="Please enter a valid title."
               onInput={inputHandler}
               initialValue={loadedPlace.title}
+              value={formState.inputs.title.value}
               initialValid={true}
             />
             <Input
@@ -128,7 +134,14 @@ const UpdatePlace = () => {
               errorText="Please enter a valid description (min. 5 characters)."
               onInput={inputHandler}
               initialValue={loadedPlace.description}
+              value={formState.inputs.description.value}
               initialValid={true}
+            />
+            <AIDescriptionPolish
+              currentDescription={formState.inputs.description.value}
+              placeTitle={formState.inputs.title.value}
+              onApplyPolished={applyPolishedDescriptionHandler}
+              token={auth.token}
             />
             <div className="form-actions">
               <Button type="button" inverse onClick={() => navigate(-1)}>
