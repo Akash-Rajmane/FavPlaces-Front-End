@@ -32,11 +32,11 @@ const UsersList = (props) => {
       >
         {props.items.map((user) => (
           <UserItem
-            key={user._id}
-            id={user._id}
+            key={user._id || user.id}
+            id={user._id || user.id}
             image={user.image}
             name={user.name}
-            placeCount={user.places.length}
+            placeCount={Array.isArray(user.places) ? user.places.length : 0}
             followStatus={user.followStatus}
           />
         ))}
