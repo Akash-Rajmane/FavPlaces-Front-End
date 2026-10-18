@@ -16,6 +16,7 @@ const TripPlanner = () => {
 
   const [city, setCity] = useState("Pune");
   const [days, setDays] = useState(1);
+  const [startDate, setStartDate] = useState("");
   const [vibe, setVibe] = useState(VIBE_OPTIONS[0]);
   const [customVibe, setCustomVibe] = useState("");
   const [onlyMyPlaces, setOnlyMyPlaces] = useState(false);
@@ -52,6 +53,7 @@ const TripPlanner = () => {
           body: JSON.stringify({
             city: city.trim(),
             days: Number(days),
+            startDate: startDate || null,
             vibe: targetVibe,
             onlyMyPlaces: auth.isLoggedIn && onlyMyPlaces,
           }),
@@ -123,6 +125,19 @@ const TripPlanner = () => {
               <option value={2}>2 Days (Weekend Trip)</option>
               <option value={3}>3 Days (Deep Exploration)</option>
             </select>
+          </div>
+
+          <div className="planner-field">
+            <label htmlFor="startDate">
+              Start Date <span style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", fontWeight: "normal" }}>(Optional)</span>
+            </label>
+            <input
+              id="startDate"
+              type="date"
+              value={startDate}
+              min={new Date().toISOString().split("T")[0]}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
           </div>
 
           <div className="planner-field planner-field--full">
