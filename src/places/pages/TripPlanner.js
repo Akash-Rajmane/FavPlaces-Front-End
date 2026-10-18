@@ -199,7 +199,9 @@ const TripPlanner = () => {
     },
     onError: (err) => {
       console.error("Google auth error:", err);
-      setCalendarError("Google authorization was cancelled or failed.");
+      setCalendarError(
+        "Google blocked or cancelled authorization. If your Google Cloud app is in 'Testing' mode, add your email to Test Users in Google Cloud Console. Alternatively, click 'Open in Google Calendar Web' below to add it instantly without any permissions."
+      );
       setSyncStatus("error");
     },
   });
