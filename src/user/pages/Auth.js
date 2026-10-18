@@ -12,6 +12,7 @@ import {
 import useForm from "../../shared/hooks/form-hook";
 import useHttpClient from "../../shared/hooks/http-hook";
 import { AuthContext } from "../../shared/context/auth-context";
+import { GoogleLogin } from "@react-oauth/google";
 import "./Auth.css";
 
 const Auth = () => {
@@ -108,6 +109,31 @@ const Auth = () => {
     }
   };
 
+  const googleSuccessHandler = async (credentialResponse) => {
+    try {
+      const responseData = await sendRequest(
+        `${process.env.REACT_APP_BACKEND_URL}/users/google-login`,
+        "POST",
+        JSON.stringify({
+          credential: credentialResponse.credential,
+        }),
+        {
+          "Content-Type": "application/json",
+        }
+      );
+
+      auth.login(responseData.userId, responseData.token, {
+        name: responseData.name,
+        email: responseData.email,
+        image: responseData.image,
+      });
+    } catch (err) {}
+  };
+
+  const googleErrorHandler = () => {
+    console.error("Google sign in failed");
+  };
+
   return (
     <React.Fragment>
       <ErrorModal error={error} onClear={clearError} />
@@ -160,6 +186,23 @@ const Auth = () => {
                 {isLoginMode ? "SIGN IN" : "SIGN UP"}
               </Button>
             </form>
+
+            <div className="auth__divider">
+              <span>OR</span>
+            </div>
+
+            <div className="auth__google-btn-wrapper">
+              <GoogleLogin
+                onSuccess={googleSuccessHandler}
+                onError={googleErrorHandler}
+                theme="outline"
+                shape="pill"
+                size="large"
+                text={isLoginMode ? "signin_with" : "signup_with"}
+                width="100%"
+              />
+            </div>
+
             <div className="auth__switch">
               <span>{isLoginMode ? "Don't have an account?" : "Already have an account?"}</span>
               <button className="auth__switch-btn" type="button" onClick={switchModeHandler}>
