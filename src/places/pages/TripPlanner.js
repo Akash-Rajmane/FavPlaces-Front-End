@@ -406,9 +406,9 @@ const TripPlanner = () => {
                     setSyncProgress("");
                     setShowCalendarModal(true);
                   }}
-                  title="Add to Google Calendar"
+                  title="Add to Calendar"
                 >
-                  📅 Add to Google Calendar
+                  📅 Add to Calendar
                 </button>
               )}
             </div>
@@ -451,7 +451,7 @@ const TripPlanner = () => {
             setShowCalendarModal(false);
           }
         }}
-        header="Add Itinerary to Calendar"
+        header="Add to Calendar"
         footer={
           <Button
             inverse
@@ -484,7 +484,7 @@ const TripPlanner = () => {
               <span className="calendar-modal__guest-icon">💡</span>
               <div>
                 <h4>Not signed in</h4>
-                <p>Sign in with your Google account to sync directly, or download the .ics file.</p>
+                <p>Sign in with your Google account to add this trip directly to your calendar.</p>
               </div>
             </div>
           )}
@@ -499,7 +499,7 @@ const TripPlanner = () => {
           {syncStatus === "success" && (
             <div className="calendar-modal__success">
               <div className="calendar-modal__success-icon">✅</div>
-              <h4>Trip Added to Google Calendar!</h4>
+              <h4>Trip Added to Calendar!</h4>
               <p>
                 Successfully created <strong>{syncedEventsCount}</strong> events for{" "}
                 <strong>{auth.email || "your calendar"}</strong>.
@@ -521,11 +521,11 @@ const TripPlanner = () => {
             <>
               {auth.isLoggedIn && auth.email ? (
                 <p className="calendar-modal__question">
-                  Do you want to add this <strong>{plan?.tripTitle}</strong> itinerary ({totalStopsCount} stops) directly to your Google Calendar for <strong>{auth.email}</strong>?
+                  Do you want to add this <strong>{plan?.tripTitle}</strong> itinerary ({totalStopsCount} stops) directly to your calendar for <strong>{auth.email}</strong>?
                 </p>
               ) : (
                 <p className="calendar-modal__question">
-                  Choose how you'd like to sync your <strong>{plan?.tripTitle}</strong> itinerary ({totalStopsCount} stops):
+                  Add your <strong>{plan?.tripTitle}</strong> itinerary ({totalStopsCount} stops) directly to your calendar:
                 </p>
               )}
 
@@ -552,6 +552,24 @@ const TripPlanner = () => {
                       </a>
                     </div>
                   )}
+                  <div style={{ marginTop: "0.5rem" }}>
+                    <button
+                      type="button"
+                      style={{
+                        background: "none",
+                        border: "none",
+                        color: "#991b1b",
+                        fontSize: "0.85rem",
+                        fontWeight: "600",
+                        cursor: "pointer",
+                        textDecoration: "underline",
+                        padding: 0,
+                      }}
+                      onClick={handleOpenGoogleCalendarWeb}
+                    >
+                      Or open pre-filled in Google Calendar Web ↗
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -570,39 +588,28 @@ const TripPlanner = () => {
                       fill="white"
                     />
                   </svg>
-                  {auth.isLoggedIn && auth.email
-                    ? `Add Directly to ${auth.email}`
-                    : "Sign in & Add to Google Calendar"}
+                  Add to Calendar
                 </button>
 
-                <button
-                  type="button"
-                  className="calendar-modal__btn calendar-modal__btn--secondary"
-                  onClick={handleOpenGoogleCalendarWeb}
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                    <polyline points="15 3 21 3 21 9" />
-                    <line x1="10" y1="14" x2="21" y2="3" />
-                  </svg>
-                  Open in Google Calendar Web
-                </button>
-
-                <button
-                  type="button"
-                  className="calendar-modal__btn calendar-modal__btn--tertiary"
-                  onClick={() => {
-                    downloadIcsFile();
-                    setShowCalendarModal(false);
-                  }}
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                    <polyline points="7 10 12 15 17 10" />
-                    <line x1="12" y1="15" x2="12" y2="3" />
-                  </svg>
-                  Download .ICS Calendar File (Apple / Outlook / Offline)
-                </button>
+                <div style={{ textAlign: "center", marginTop: "0.4rem" }}>
+                  <button
+                    type="button"
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: "var(--color-text-muted)",
+                      fontSize: "0.82rem",
+                      cursor: "pointer",
+                      textDecoration: "underline",
+                    }}
+                    onClick={() => {
+                      downloadIcsFile();
+                      setShowCalendarModal(false);
+                    }}
+                  >
+                    Or export as .ics file
+                  </button>
+                </div>
               </div>
             </>
           )}
