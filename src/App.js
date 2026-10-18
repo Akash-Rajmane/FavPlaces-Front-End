@@ -20,6 +20,7 @@ const Connections = React.lazy(() => import("./user/pages/Connections"));
 const NewPlace = React.lazy(() => import("./places/pages/NewPlace"));
 const UserPlaces = React.lazy(() => import("./places/pages/UserPlaces"));
 const UpdatePlace = React.lazy(() => import("./places/pages/UpdatePlace"));
+const TripPlanner = React.lazy(() => import("./places/pages/TripPlanner"));
 const Auth = React.lazy(() => import("./user/pages/Auth"));
 
 function App() {
@@ -39,6 +40,7 @@ function App() {
         <Route path="/places/new" element={<NewPlace />} />
         <Route path="/places/:placeId" element={<UpdatePlace />} />
         <Route path="/place/:placeId" element={<PlaceDetail />} />
+        <Route path="/planner" element={<TripPlanner />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     );
@@ -48,6 +50,7 @@ function App() {
         <Route path="/" element={<Places />} />
         <Route path="/users" element={<Users />} />
         <Route path="/place/:placeId" element={<PlaceDetail />} />
+        <Route path="/planner" element={<TripPlanner />} />
         <Route path="/:userId/places" element={<UserPlaces />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="*" element={<Navigate to="/auth" replace />} />

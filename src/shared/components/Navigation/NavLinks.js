@@ -11,6 +11,9 @@ const NavLinks = () => {
         <NavLink to="/">Places</NavLink>
       </li>
       <li>
+        <NavLink to="/planner">Trip Planner</NavLink>
+      </li>
+      <li>
         <NavLink to="/users">All Users</NavLink>
       </li>
       {auth.isLoggedIn && (
