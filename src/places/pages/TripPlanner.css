@@ -199,6 +199,13 @@
   border: 1px solid rgba(59, 130, 246, 0.25);
 }
 
+.trip-plan__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
 .trip-plan__calendar-btn {
   display: inline-flex;
   align-items: center;
@@ -217,6 +224,28 @@
 .trip-plan__calendar-btn:hover {
   background: #059669;
   transform: translateY(-1px);
+}
+
+.trip-plan__whatsapp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.25rem;
+  background: #25d366;
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: 0 2px 6px rgba(37, 211, 102, 0.25);
+}
+
+.trip-plan__whatsapp-btn:hover {
+  background: #1eb855;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(37, 211, 102, 0.35);
 }
 
 /* Days & Timeline */
