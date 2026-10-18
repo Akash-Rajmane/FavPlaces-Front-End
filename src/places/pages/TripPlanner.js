@@ -1,6 +1,9 @@
 import React, { useState, useContext } from "react";
 import { AuthContext } from "../../shared/context/auth-context";
 import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
+import Modal from "../../shared/components/UIElements/Modal";
+import Button from "../../shared/components/FormElements/Button";
+import { useGoogleLogin } from "@react-oauth/google";
 import "./TripPlanner.css";
 
 const VIBE_OPTIONS = [
@@ -24,6 +27,12 @@ const TripPlanner = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [plan, setPlan] = useState(null);
+
+  const [showCalendarModal, setShowCalendarModal] = useState(false);
+  const [syncStatus, setSyncStatus] = useState("idle"); // 'idle' | 'syncing' | 'success' | 'error'
+  const [syncProgress, setSyncProgress] = useState("");
+  const [calendarError, setCalendarError] = useState(null);
+  const [syncedEventsCount, setSyncedEventsCount] = useState(0);
 
   const handlePlanSubmit = async (e) => {
     e.preventDefault();
@@ -73,6 +82,156 @@ const TripPlanner = () => {
     }
   };
 
+  const parseTimeSlotToISO = (datePrefix, timeSlot) => {
+    if (!timeSlot || typeof timeSlot !== "string") {
+      return {
+        startISO: `${datePrefix}T09:00:00`,
+        endISO: `${datePrefix}T10:30:00`,
+      };
+    }
+
+    const match = timeSlot.match(
+      /(\d{1,2}):(\d{2})\s*(AM|PM)?\s*-\s*(\d{1,2}):(\d{2})\s*(AM|PM)?/i
+    );
+
+    const pad = (n) => String(n).padStart(2, "0");
+
+    if (match) {
+      let [, sH, sM, sP, eH, eM, eP] = match;
+      sH = parseInt(sH, 10);
+      sM = parseInt(sM, 10);
+      eH = parseInt(eH, 10);
+      eM = parseInt(eM, 10);
+
+      if (sP && sP.toUpperCase() === "PM" && sH < 12) sH += 12;
+      if (sP && sP.toUpperCase() === "AM" && sH === 12) sH = 0;
+      if (eP && eP.toUpperCase() === "PM" && eH < 12) eH += 12;
+      if (eP && eP.toUpperCase() === "AM" && eH === 12) eH = 0;
+
+      const offsetMinutes = -new Date().getTimezoneOffset();
+      const sign = offsetMinutes >= 0 ? "+" : "-";
+      const absMin = Math.abs(offsetMinutes);
+      const tzString = `${sign}${pad(Math.floor(absMin / 60))}:${pad(absMin % 60)}`;
+
+      return {
+        startISO: `${datePrefix}T${pad(sH)}:${pad(sM)}:00${tzString}`,
+        endISO: `${datePrefix}T${pad(eH)}:${pad(eM)}:00${tzString}`,
+      };
+    }
+
+    return {
+      startISO: `${datePrefix}T10:00:00`,
+      endISO: `${datePrefix}T12:00:00`,
+    };
+  };
+
+  const syncAllStopsToGoogleCalendar = async (accessToken) => {
+    const baseDate = startDate ? new Date(startDate) : new Date();
+    const tripBase = isNaN(baseDate.getTime()) ? new Date() : baseDate;
+
+    let totalStops = 0;
+    (plan.days || []).forEach((d) => {
+      totalStops += (d.schedule || []).length;
+    });
+
+    let completed = 0;
+    for (const day of plan.days || []) {
+      const dayDate = new Date(tripBase);
+      dayDate.setDate(tripBase.getDate() + (day.dayNumber - 1));
+      const year = dayDate.getFullYear();
+      const month = String(dayDate.getMonth() + 1).padStart(2, "0");
+      const date = String(dayDate.getDate()).padStart(2, "0");
+      const datePrefix = `${year}-${month}-${date}`;
+
+      for (const item of day.schedule || []) {
+        completed++;
+        setSyncProgress(`Adding stop ${completed} of ${totalStops}: "${item.placeTitle}"...`);
+
+        const { startISO, endISO } = parseTimeSlotToISO(datePrefix, item.timeSlot);
+
+        const eventBody = {
+          summary: `${item.placeTitle} - ${plan.tripTitle || `${city} Trip`}`,
+          description: `${item.activity}\n\n💡 Travel Tip: ${item.travelTip || "Enjoy your visit!"}\n📍 Location: ${item.address}\n\nCurated with FavPlaces`,
+          location: item.address || city,
+          start: {
+            dateTime: startISO,
+            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          },
+          end: {
+            dateTime: endISO,
+            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          },
+        };
+
+        const res = await fetch("https://www.googleapis.com/calendar/v3/calendars/primary/events", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(eventBody),
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error?.message || `Failed to create event for ${item.placeTitle}`);
+        }
+      }
+    }
+
+    setSyncedEventsCount(completed);
+  };
+
+  const requestGoogleCalendarAuth = useGoogleLogin({
+    scope: "https://www.googleapis.com/auth/calendar.events",
+    hint: auth.email || undefined,
+    onSuccess: async (tokenResponse) => {
+      try {
+        setSyncStatus("syncing");
+        setCalendarError(null);
+        await syncAllStopsToGoogleCalendar(tokenResponse.access_token);
+        setSyncStatus("success");
+      } catch (err) {
+        console.error("Google Calendar sync error:", err);
+        setCalendarError(err.message || "Failed to create events in Google Calendar.");
+        setSyncStatus("error");
+      }
+    },
+    onError: (err) => {
+      console.error("Google auth error:", err);
+      setCalendarError("Google authorization was cancelled or failed.");
+      setSyncStatus("error");
+    },
+  });
+
+  const handleOpenGoogleCalendarWeb = () => {
+    const baseDate = startDate ? new Date(startDate) : new Date();
+    const tripBase = isNaN(baseDate.getTime()) ? new Date() : baseDate;
+    const startStr = tripBase.toISOString().replace(/-|:|\.\d+/g, "").slice(0, 15) + "Z";
+    const endDate = new Date(tripBase);
+    endDate.setDate(tripBase.getDate() + Number(days));
+    const endStr = endDate.toISOString().replace(/-|:|\.\d+/g, "").slice(0, 15) + "Z";
+
+    const title = encodeURIComponent(plan.tripTitle || `Trip to ${city}`);
+    const details = encodeURIComponent(
+      `${plan.summary || ""}\n\nSchedule highlights:\n` +
+        (plan.days || [])
+          .map(
+            (d) =>
+              `Day ${d.dayNumber} (${d.theme}): ` +
+              (d.schedule || []).map((s) => `${s.timeSlot} - ${s.placeTitle}`).join("; ")
+          )
+          .join("\n")
+    );
+    const location = encodeURIComponent(city);
+    let gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startStr}/${endStr}&details=${details}&location=${location}`;
+    if (auth.email) {
+      gcalUrl += `&authuser=${encodeURIComponent(auth.email)}`;
+    }
+
+    window.open(gcalUrl, "_blank", "noopener,noreferrer");
+  };
+
   const downloadIcsFile = () => {
     if (!plan?.calendarData?.icsData) return;
     const blob = new Blob([plan.calendarData.icsData], {
@@ -86,6 +245,11 @@ const TripPlanner = () => {
     link.click();
     document.body.removeChild(link);
   };
+
+  const totalStopsCount = (plan?.days || []).reduce(
+    (acc, day) => acc + (day.schedule?.length || 0),
+    0
+  );
 
   return (
     <div className="trip-planner">
@@ -234,10 +398,15 @@ const TripPlanner = () => {
                 <button
                   type="button"
                   className="trip-plan__calendar-btn"
-                  onClick={downloadIcsFile}
-                  title="Download .ics calendar file"
+                  onClick={() => {
+                    setCalendarError(null);
+                    setSyncStatus("idle");
+                    setSyncProgress("");
+                    setShowCalendarModal(true);
+                  }}
+                  title="Add to Google Calendar"
                 >
-                  📅 Add to Google / Apple Calendar
+                  📅 Add to Google Calendar
                 </button>
               )}
             </div>
@@ -272,6 +441,151 @@ const TripPlanner = () => {
           ))}
         </div>
       )}
+
+      <Modal
+        show={showCalendarModal}
+        onCancel={() => {
+          if (syncStatus !== "syncing") {
+            setShowCalendarModal(false);
+          }
+        }}
+        header="Add Itinerary to Calendar"
+        footer={
+          <Button
+            inverse
+            onClick={() => setShowCalendarModal(false)}
+            disabled={syncStatus === "syncing"}
+          >
+            {syncStatus === "success" ? "Done" : "Cancel"}
+          </Button>
+        }
+      >
+        <div className="calendar-modal">
+          {auth.isLoggedIn && auth.email ? (
+            <div className="calendar-modal__account">
+              <div className="calendar-modal__account-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M19 4H18V2H16V4H8V2H6V4H5C3.89 4 3.01 4.9 3.01 6L3 20C3 21.1 3.89 22 5 22H19C20.1 22 21 21.1 21 20V6C21 4.9 20.1 4H19ZM19 20H5V10H19V20ZM19 8H5V6H19V8Z"
+                    fill="#1a73e8"
+                  />
+                </svg>
+              </div>
+              <div className="calendar-modal__account-details">
+                <span className="calendar-modal__account-label">Signed in with Google</span>
+                <span className="calendar-modal__account-email">{auth.email}</span>
+              </div>
+              <span className="calendar-modal__account-badge">Google Calendar</span>
+            </div>
+          ) : (
+            <div className="calendar-modal__guest">
+              <span className="calendar-modal__guest-icon">💡</span>
+              <div>
+                <h4>Not signed in</h4>
+                <p>Sign in with your Google account to sync directly, or download the .ics file.</p>
+              </div>
+            </div>
+          )}
+
+          {syncStatus === "syncing" && (
+            <div className="calendar-modal__progress">
+              <LoadingSpinner />
+              <p className="calendar-modal__progress-text">{syncProgress}</p>
+            </div>
+          )}
+
+          {syncStatus === "success" && (
+            <div className="calendar-modal__success">
+              <div className="calendar-modal__success-icon">✅</div>
+              <h4>Trip Added to Google Calendar!</h4>
+              <p>
+                Successfully created <strong>{syncedEventsCount}</strong> events for{" "}
+                <strong>{auth.email || "your calendar"}</strong>.
+              </p>
+              <div className="calendar-modal__success-actions">
+                <a
+                  href="https://calendar.google.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="calendar-modal__open-btn"
+                >
+                  Open Google Calendar ↗
+                </a>
+              </div>
+            </div>
+          )}
+
+          {syncStatus !== "syncing" && syncStatus !== "success" && (
+            <>
+              {auth.isLoggedIn && auth.email ? (
+                <p className="calendar-modal__question">
+                  Do you want to add this <strong>{plan?.tripTitle}</strong> itinerary ({totalStopsCount} stops) directly to your Google Calendar for <strong>{auth.email}</strong>?
+                </p>
+              ) : (
+                <p className="calendar-modal__question">
+                  Choose how you'd like to sync your <strong>{plan?.tripTitle}</strong> itinerary ({totalStopsCount} stops):
+                </p>
+              )}
+
+              {calendarError && (
+                <div className="calendar-modal__error">
+                  ⚠️ {calendarError}
+                </div>
+              )}
+
+              <div className="calendar-modal__actions">
+                <button
+                  type="button"
+                  className="calendar-modal__btn calendar-modal__btn--primary"
+                  onClick={() => {
+                    setCalendarError(null);
+                    requestGoogleCalendarAuth();
+                  }}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M19 4H18V2H16V4H8V2H6V4H5C3.89 4 3.01 4.9 3.01 6L3 20C3 21.1 3.89 22 5 22H19C20.1 22 21 21.1 21 20V6C21 4.9 20.1 4H19ZM19 20H5V10H19V20ZM19 8H5V6H19V8Z"
+                      fill="white"
+                    />
+                  </svg>
+                  {auth.isLoggedIn && auth.email
+                    ? `Add Directly to ${auth.email}`
+                    : "Sign in & Add to Google Calendar"}
+                </button>
+
+                <button
+                  type="button"
+                  className="calendar-modal__btn calendar-modal__btn--secondary"
+                  onClick={handleOpenGoogleCalendarWeb}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                    <polyline points="15 3 21 3 21 9" />
+                    <line x1="10" y1="14" x2="21" y2="3" />
+                  </svg>
+                  Open in Google Calendar Web
+                </button>
+
+                <button
+                  type="button"
+                  className="calendar-modal__btn calendar-modal__btn--tertiary"
+                  onClick={() => {
+                    downloadIcsFile();
+                    setShowCalendarModal(false);
+                  }}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                  </svg>
+                  Download .ICS Calendar File (Apple / Outlook / Offline)
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </Modal>
     </div>
   );
 };
