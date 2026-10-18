@@ -531,7 +531,27 @@ const TripPlanner = () => {
 
               {calendarError && (
                 <div className="calendar-modal__error">
-                  ⚠️ {calendarError}
+                  <div>⚠️ {calendarError}</div>
+                  {(calendarError.includes("has not been used") ||
+                    calendarError.includes("calendar-json.googleapis.com")) && (
+                    <div style={{ marginTop: "0.5rem" }}>
+                      <a
+                        href="https://console.developers.google.com/apis/api/calendar-json.googleapis.com/overview?project=384601241809"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "0.3rem",
+                          color: "#991b1b",
+                          fontWeight: "700",
+                          textDecoration: "underline",
+                        }}
+                      >
+                        👉 Click here to Enable Google Calendar API ↗
+                      </a>
+                    </div>
+                  )}
                 </div>
               )}
 
