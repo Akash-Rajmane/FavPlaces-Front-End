@@ -89,13 +89,12 @@ const TripPlanner = () => {
     <div className="trip-planner">
       <div className="trip-planner__hero">
         <div className="trip-planner__badge">
-          <span>✨</span> RAG + MCP Autonomous Planner
+          <span>✨</span> Smart Travel Assistant
         </div>
-        <h1>Autonomous Trip Planner</h1>
+        <h1>Plan Your Next Adventure</h1>
         <p>
-          Powered by MongoDB Vector Search and live MCP tools. Vectorizes your
-          travel vibe, gathers community favorite spots, checks live weather,
-          and generates your scheduled timeline.
+          Tell us your destination and desired vibe. We'll curate the best spots
+          from the community, check the local weather, and map out your perfect daily itinerary.
         </p>
       </div>
 
@@ -182,10 +181,10 @@ const TripPlanner = () => {
             >
               {isLoading ? (
                 <>
-                  <span className="ai-spinner"></span> Synthesizing RAG & Tools...
+                  <span className="ai-spinner"></span> Curating Your Itinerary...
                 </>
               ) : (
-                <>✨ Generate Smart Itinerary</>
+                <>✨ Generate Itinerary</>
               )}
             </button>
           </div>
@@ -196,8 +195,7 @@ const TripPlanner = () => {
         <div style={{ textAlign: "center", margin: "4rem 0" }}>
           <LoadingSpinner />
           <p style={{ marginTop: "1rem", color: "var(--color-text-muted)" }}>
-            Running Atlas Vector Search across FavPlaces, checking live weather,
-            and optimizing route order...
+            Finding favorite local spots, checking weather conditions, and crafting your schedule...
           </p>
         </div>
       )}
