@@ -417,7 +417,8 @@ const TripPlanner = () => {
       text += `_${plan.summary}_\n\n`;
     }
     if (plan.liveWeather?.currentTemperature) {
-      text += `🌤️ *Live Weather:* ${plan.liveWeather.currentTemperature} (Rain risk: ${plan.liveWeather.forecastSummary?.rainChance || "Low"})\n\n`;
+      const weatherTitle = plan.liveWeather.weatherLabel || "Live Weather";
+      text += `🌤️ *${weatherTitle}:* ${plan.liveWeather.currentTemperature} (Rain risk: ${plan.liveWeather.forecastSummary?.rainChance || "Low"})\n\n`;
     }
 
     (plan.days || []).forEach((day) => {
@@ -731,8 +732,13 @@ const TripPlanner = () => {
               <div className="trip-plan__weather">
                 <span>🌤️</span>
                 <span>
-                  Live Weather: {plan.liveWeather?.currentTemperature} (Rain chance:{" "}
-                  {plan.liveWeather?.forecastSummary?.rainChance || "Low"})
+                  {plan.liveWeather?.weatherLabel || "Live Weather"}:{" "}
+                  <strong>{plan.liveWeather?.currentTemperature}</strong>{" "}
+                  (Rain chance: {plan.liveWeather?.forecastSummary?.rainChance || "Low"}
+                  {plan.liveWeather?.forecastSummary?.maxTemp && plan.liveWeather?.isDateSpecific
+                    ? `, High: ${plan.liveWeather.forecastSummary.maxTemp}`
+                    : ""}
+                  )
                 </span>
               </div>
 
