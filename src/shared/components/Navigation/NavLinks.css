@@ -3,37 +3,44 @@
   margin: 0;
   padding: 0;
   width: 100%;
-  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
+  align-items: stretch;
+  gap: 0.4rem;
 }
 
 .nav-links li {
-  margin: 1rem;
+  margin: 0;
+  width: 100%;
+  display: flex;
 }
 
 .nav-links a {
   border: 1px solid transparent;
   color: var(--color-text-main);
   text-decoration: none;
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius-pill);
+  padding: 0.65rem 1rem;
+  border-radius: var(--radius-md);
   font-weight: 600;
   transition: all var(--transition-fast);
   font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  width: 100%;
+  line-height: 1.2;
 }
 
 .nav-links a:hover,
 .nav-links a:active {
   background: var(--color-bg);
-  color: var(--color-text-main);
+  color: var(--color-primary);
 }
 
 .nav-links a.active {
   color: var(--color-primary);
-  background: rgba(210, 105, 30, 0.08); /* slight orange tint background */
+  background: rgba(210, 105, 30, 0.08);
 }
 
 .nav-links button {
@@ -41,12 +48,17 @@
   border: none;
   background: transparent;
   color: var(--color-text-main);
-  padding: 0.5rem 1rem;
+  padding: 0.65rem 1rem;
   font: inherit;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-md);
   font-weight: 600;
   transition: all var(--transition-fast);
   font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  width: 100%;
+  line-height: 1.2;
 }
 
 .nav-links button:focus {
@@ -55,38 +67,91 @@
 
 .nav-links button:hover,
 .nav-links button:active {
-  background: #FEF2F2;
-  color: #DC2626; /* Hover red for logout */
+  background: #fef2f2;
+  color: #dc2626;
 }
 
-@media (min-width: 768px) {
+/* ==========================================================
+   DESKTOP NAVIGATION (min-width: 1024px)
+   ========================================================== */
+@media (min-width: 1024px) {
   .nav-links {
     flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    width: auto;
+    height: 100%;
+    gap: 0.2rem;
   }
 
   .nav-links li {
-    margin: 0 0.25rem;
+    width: auto;
+    margin: 0;
+  }
+
+  .nav-links a,
+  .nav-links button {
+    width: auto;
+    border-radius: var(--radius-pill);
+    padding: 0.4rem 0.6rem;
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+
+  .nav-links a.active {
+    background: rgba(210, 105, 30, 0.09);
   }
 }
 
+/* Wide Desktop Screens (min-width: 1280px) */
+@media (min-width: 1280px) {
+  .nav-links {
+    gap: 0.35rem;
+  }
+
+  .nav-links a,
+  .nav-links button {
+    padding: 0.45rem 0.8rem;
+    font-size: 0.92rem;
+  }
+}
+
+/* Ultra-wide Screens (min-width: 1440px) */
+@media (min-width: 1440px) {
+  .nav-links {
+    gap: 0.5rem;
+  }
+
+  .nav-links a,
+  .nav-links button {
+    padding: 0.5rem 0.95rem;
+    font-size: 0.95rem;
+  }
+}
+
+/* ==========================================================
+   PRO SUBSCRIPTION BADGE (Never wraps, stays next to label)
+   ========================================================== */
 .nav-pro-badge {
   display: inline-flex;
   align-items: center;
-  margin-left: 0.4rem;
-  padding: 0.12rem 0.45rem;
-  font-size: 0.65rem;
+  justify-content: center;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-left: 0.35rem;
+  padding: 0.12rem 0.42rem;
+  font-size: 0.62rem;
   font-weight: 800;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   border-radius: 9999px;
   background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
   color: #ffffff;
-  box-shadow: 0 2px 4px rgba(234, 88, 12, 0.3);
-  vertical-align: middle;
+  box-shadow: 0 1px 3px rgba(234, 88, 12, 0.3);
+  line-height: 1;
 }
 
 .nav-pro-badge.active-pro {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.35);
+  box-shadow: 0 1px 3px rgba(16, 185, 129, 0.35);
 }
-

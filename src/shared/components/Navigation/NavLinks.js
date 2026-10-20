@@ -12,7 +12,7 @@ const NavLinks = () => {
       </li>
       <li>
         <NavLink to="/planner">
-          Trip Planner
+          <span>Trip Planner</span>
           <span className={`nav-pro-badge ${auth.isPremium ? "active-pro" : ""}`}>
             {auth.isPremium ? "PRO ✦" : "PRO"}
           </span>
