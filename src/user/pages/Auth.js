@@ -84,6 +84,7 @@ const Auth = () => {
           name: responseData.name,
           email: responseData.email,
           image: responseData.image,
+          isPremium: responseData.isPremium,
         });
       } catch (err) {}
     } else {
@@ -104,6 +105,7 @@ const Auth = () => {
           name: responseData.name,
           email: responseData.email,
           image: responseData.image,
+          isPremium: responseData.isPremium,
         });
       } catch (err) {}
     }
@@ -126,6 +128,7 @@ const Auth = () => {
         name: responseData.name,
         email: responseData.email,
         image: responseData.image,
+        isPremium: responseData.isPremium,
       });
     } catch (err) {}
   };

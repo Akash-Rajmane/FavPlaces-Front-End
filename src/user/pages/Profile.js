@@ -1,4 +1,5 @@
 import { useContext, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { AuthContext } from "../../shared/context/auth-context";
 import NotificationToggle from "../components/NotificationToggle";
 import useHttpClient from "../../shared/hooks/http-hook";
@@ -74,7 +75,27 @@ const Profile = () => {
             <Avatar image={auth.image || ""} alt={auth.name || "Profile"} />
           </div>
           <div className="profile-text-info">
-            <h2>{auth.name || "Your Profile"}</h2>
+            <h2>
+              {auth.name || "Your Profile"}
+              {auth.isPremium && (
+                <span
+                  style={{
+                    display: "inline-block",
+                    marginLeft: "0.5rem",
+                    padding: "0.15rem 0.55rem",
+                    fontSize: "0.75rem",
+                    fontWeight: "800",
+                    background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                    color: "#fff",
+                    borderRadius: "9999px",
+                    verticalAlign: "middle",
+                    boxShadow: "0 2px 4px rgba(16, 185, 129, 0.35)",
+                  }}
+                >
+                  💎 PRO
+                </span>
+              )}
+            </h2>
             <p>{auth.email || ""}</p>
           </div>
         </div>
@@ -82,6 +103,48 @@ const Profile = () => {
 
       <div className="profile-grid">
         <div className="profile-column">
+          <Card className="profile-card-section">
+            <h3>Membership & Plan</h3>
+            {auth.isPremium ? (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  color: "#059669",
+                  fontWeight: "600",
+                  fontSize: "0.92rem",
+                }}
+              >
+                <span>💎</span> FavPlaces Pro Member (All Features Unlocked)
+              </div>
+            ) : (
+              <div>
+                <p className="profile-muted-text" style={{ marginBottom: "0.75rem" }}>
+                  Standard Plan (Free). Upgrade to unlock the AI Trip Planner, real-time weather, and Google Calendar sync.
+                </p>
+                <Link
+                  to="/planner"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.3rem",
+                    background: "linear-gradient(135deg, #f59e0b 0%, #d2691e 100%)",
+                    color: "#ffffff",
+                    padding: "0.45rem 1rem",
+                    borderRadius: "9999px",
+                    textDecoration: "none",
+                    fontSize: "0.85rem",
+                    fontWeight: "700",
+                    boxShadow: "0 2px 6px rgba(210, 105, 30, 0.3)",
+                  }}
+                >
+                  <span>✦</span> Upgrade to Pro (₹199)
+                </Link>
+              </div>
+            )}
+          </Card>
+
           <Card className="profile-card-section">
             <h3>Preferences</h3>
             <NotificationToggle />

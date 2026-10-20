@@ -24,7 +24,7 @@ const TripPlanner = React.lazy(() => import("./places/pages/TripPlanner"));
 const Auth = React.lazy(() => import("./user/pages/Auth"));
 
 function App() {
-  const { token, login, logout, userId, name, email, image } = useAuth();
+  const { token, login, logout, userId, name, email, image, isPremium, setPremium } = useAuth();
 
   let routes;
 
@@ -67,6 +67,8 @@ function App() {
         name,
         email,
         image,
+        isPremium,
+        setPremium,
         login,
         logout,
       }}

@@ -1,4 +1,5 @@
 import React, { useState, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../shared/context/auth-context";
 import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
 import Modal from "../../shared/components/UIElements/Modal";
@@ -14,8 +15,24 @@ const VIBE_OPTIONS = [
   "Family-friendly attractions, parks, and easy strolls",
 ];
 
+const loadRazorpayScript = () => {
+  return new Promise((resolve) => {
+    if (window.Razorpay) {
+      resolve(true);
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
+
 const TripPlanner = () => {
   const auth = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const [city, setCity] = useState("Pune");
   const [days, setDays] = useState(1);
@@ -33,6 +50,123 @@ const TripPlanner = () => {
   const [syncProgress, setSyncProgress] = useState("");
   const [calendarError, setCalendarError] = useState(null);
   const [syncedEventsCount, setSyncedEventsCount] = useState(0);
+
+  // Razorpay Pro upgrade state
+  const [isUpgrading, setIsUpgrading] = useState(false);
+  const [upgradeError, setUpgradeError] = useState(null);
+
+  const handleUpgradeToPro = async () => {
+    if (!auth.isLoggedIn) {
+      navigate("/auth");
+      return;
+    }
+
+    setIsUpgrading(true);
+    setUpgradeError(null);
+
+    try {
+      const isLoaded = await loadRazorpayScript();
+      if (!isLoaded) {
+        throw new Error(
+          "Razorpay SDK failed to load. Please check your internet connection."
+        );
+      }
+
+      const orderRes = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/payment/create-order`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${auth.token}`,
+          },
+        }
+      );
+
+      const orderData = await orderRes.json();
+      if (!orderRes.ok) {
+        throw new Error(orderData.message || "Failed to create payment order.");
+      }
+
+      if (orderData.alreadyPremium) {
+        auth.setPremium(true);
+        setIsUpgrading(false);
+        return;
+      }
+
+      const options = {
+        key:
+          orderData.keyId ||
+          process.env.REACT_APP_RZP_API_KEY ||
+          "rzp_test_TqCLUZnwdUdqAU",
+        amount: orderData.amount,
+        currency: orderData.currency || "INR",
+        name: "FavPlaces Pro",
+        description: "Autonomous AI Trip Planner (Lifetime Access)",
+        image: "https://cdn-icons-png.flaticon.com/512/854/854878.png",
+        order_id: orderData.orderId,
+        handler: async function (paymentResponse) {
+          try {
+            setIsUpgrading(true);
+            const verifyRes = await fetch(
+              `${process.env.REACT_APP_BACKEND_URL}/payment/verify`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${auth.token}`,
+                },
+                body: JSON.stringify({
+                  razorpay_order_id: paymentResponse.razorpay_order_id,
+                  razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                  razorpay_signature: paymentResponse.razorpay_signature,
+                }),
+              }
+            );
+
+            const verifyData = await verifyRes.json();
+            if (!verifyRes.ok) {
+              throw new Error(
+                verifyData.message || "Payment signature verification failed."
+              );
+            }
+
+            auth.setPremium(true);
+          } catch (vErr) {
+            setUpgradeError(
+              vErr.message || "Verification failed. Please contact support."
+            );
+          } finally {
+            setIsUpgrading(false);
+          }
+        },
+        prefill: {
+          name: auth.name || orderData.userName || "",
+          email: auth.email || orderData.userEmail || "",
+        },
+        theme: {
+          color: "#d2691e",
+        },
+        modal: {
+          ondismiss: function () {
+            setIsUpgrading(false);
+          },
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.on("payment.failed", function (failResp) {
+        setUpgradeError(
+          failResp.error?.description || "Payment failed. Please try again."
+        );
+        setIsUpgrading(false);
+      });
+      razorpay.open();
+    } catch (err) {
+      setUpgradeError(err.message || "Failed to start payment.");
+      setIsUpgrading(false);
+    }
+  };
 
   const handlePlanSubmit = async (e) => {
     e.preventDefault();
@@ -69,14 +203,41 @@ const TripPlanner = () => {
         }
       );
 
-      const data = await response.json();
+      let data = {};
+      try {
+        data = await response.json();
+      } catch (_) {
+        data = {};
+      }
+
       if (!response.ok) {
-        throw new Error(data.message || "Failed to generate itinerary.");
+        let msg = data.message || "Failed to generate itinerary. Please try again.";
+        if (typeof msg === "string" && (msg.includes('{"error"') || msg.startsWith("{"))) {
+          try {
+            const parsed = JSON.parse(msg);
+            if (
+              parsed.error?.code === 503 ||
+              parsed.error?.message?.includes("high demand") ||
+              parsed.error?.status === "UNAVAILABLE"
+            ) {
+              msg = "AI travel servers are currently experiencing high demand. Please click Retry below in a few moments.";
+            } else if (parsed.error?.message) {
+              msg = parsed.error.message;
+            }
+          } catch (_) {
+            msg = "AI service is momentarily busy. Please try again shortly.";
+          }
+        }
+        throw new Error(msg);
       }
 
       setPlan(data.plan);
     } catch (err) {
-      setError(err.message || "Something went wrong while planning your trip.");
+      let friendlyError = err.message || "Something went wrong while planning your trip.";
+      if (friendlyError.includes("Failed to fetch") || friendlyError.includes("NetworkError")) {
+        friendlyError = "Server connection timed out or is temporarily unreachable. Please wait a few seconds and click Retry.";
+      }
+      setError(friendlyError);
     } finally {
       setIsLoading(false);
     }
@@ -287,6 +448,130 @@ const TripPlanner = () => {
     0
   );
 
+  if (!auth.isLoggedIn || !auth.isPremium) {
+    return (
+      <div className="trip-planner">
+        <div className="trip-planner__hero">
+          <div className="trip-planner__badge">
+            <span>💎</span> Pro Exclusive Feature
+          </div>
+          <h1>Autonomous AI Trip Planner</h1>
+          <p>
+            Experience next-generation travel with Gemini-powered daily itineraries,
+            real-time weather forecasts, Google Calendar sync, and WhatsApp exports.
+          </p>
+        </div>
+
+        <div className="trip-planner__paywall">
+          <div className="trip-planner__paywall-card">
+            <div className="trip-planner__paywall-icon">✈️</div>
+            <div className="trip-planner__paywall-badge">
+              <span>✦</span> FavPlaces Pro
+            </div>
+            <h2>Unlock AI Trip Planning</h2>
+            <p className="paywall-subtitle">
+              {auth.isLoggedIn
+                ? `Welcome, ${auth.name || "Explorer"}! Upgrade your account to unlock autonomous day-by-day travel planning.`
+                : "Sign in and upgrade to unlock autonomous day-by-day travel planning."}
+            </p>
+
+            <div className="trip-planner__paywall-grid">
+              <div className="trip-planner__paywall-feature">
+                <div className="trip-planner__paywall-feature-icon">✨</div>
+                <div>
+                  <div className="trip-planner__paywall-feature-title">AI Itinerary Generation</div>
+                  <div className="trip-planner__paywall-feature-desc">
+                    Personalized multi-day plans based on your travel vibe and saved favorite places.
+                  </div>
+                </div>
+              </div>
+
+              <div className="trip-planner__paywall-feature">
+                <div className="trip-planner__paywall-feature-icon">🌦️</div>
+                <div>
+                  <div className="trip-planner__paywall-feature-title">Live Weather & Rain Warnings</div>
+                  <div className="trip-planner__paywall-feature-desc">
+                    Real-time temperature and precipitation forecasts via Open-Meteo.
+                  </div>
+                </div>
+              </div>
+
+              <div className="trip-planner__paywall-feature">
+                <div className="trip-planner__paywall-feature-icon">📅</div>
+                <div>
+                  <div className="trip-planner__paywall-feature-title">1-Click Google Calendar Sync</div>
+                  <div className="trip-planner__paywall-feature-desc">
+                    Direct sync of all planned stops, schedules, and tips into your Google Calendar.
+                  </div>
+                </div>
+              </div>
+
+              <div className="trip-planner__paywall-feature">
+                <div className="trip-planner__paywall-feature-icon">💬</div>
+                <div>
+                  <div className="trip-planner__paywall-feature-title">1-Click WhatsApp Export</div>
+                  <div className="trip-planner__paywall-feature-desc">
+                    Share complete formatted itineraries with friends and travel groups effortlessly.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="trip-planner__paywall-pricing">
+              <div className="paywall-pricing__price">
+                <span className="paywall-pricing__amount">₹199</span>
+                <span className="paywall-pricing__original">₹999</span>
+                <span className="paywall-pricing__term">One-time / Lifetime</span>
+              </div>
+              <div className="paywall-pricing__tag">
+                <span>🔥</span> 80% Off Launch Discount
+              </div>
+            </div>
+
+            {upgradeError && (
+              <div className="trip-planner__error" style={{ marginBottom: "1.5rem" }}>
+                <span className="trip-planner__error-icon">⚠️</span>
+                <span>{upgradeError}</span>
+              </div>
+            )}
+
+            <div className="paywall-actions">
+              {auth.isLoggedIn ? (
+                <button
+                  type="button"
+                  className="paywall-upgrade-btn"
+                  onClick={handleUpgradeToPro}
+                  disabled={isUpgrading}
+                >
+                  {isUpgrading ? (
+                    <>
+                      <LoadingSpinner asOverlay={false} /> Processing Payment...
+                    </>
+                  ) : (
+                    <>
+                      <span>💳</span> Upgrade to Pro with Razorpay (₹199)
+                    </>
+                  )}
+                </button>
+              ) : (
+                <Link to="/auth" className="paywall-upgrade-btn">
+                  <span>🔐</span> Sign In to Upgrade
+                </Link>
+              )}
+
+              <div className="paywall-test-note">
+                <span>🛡️</span>
+                <span>
+                  <strong>Razorpay Test Mode:</strong> Use test card details or mock UPI. No real money will be charged.
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="trip-planner">
       <div className="trip-planner__hero">
@@ -298,6 +583,15 @@ const TripPlanner = () => {
           Tell us your destination and desired vibe. We'll curate the best spots
           from the community, check the local weather, and map out your perfect daily itinerary.
         </p>
+      </div>
+
+      <div className="trip-planner__pro-active-banner">
+        <div className="trip-planner__pro-active-left">
+          <span className="trip-planner__pro-active-badge">💎 PRO ACTIVE</span>
+          <span className="trip-planner__pro-active-text">
+            FavPlaces Pro Unlocked — Unlimited Gemini AI Itineraries, Calendar Sync & Live Weather Forecasts
+          </span>
+        </div>
       </div>
 
       <div className="trip-planner__card">
@@ -383,8 +677,20 @@ const TripPlanner = () => {
           )}
 
           {error && (
-            <div style={{ gridColumn: "1 / -1", color: "#ef4444", fontWeight: "600" }}>
-              ⚠️ {error}
+            <div className="planner-error-banner">
+              <div className="planner-error-banner__icon">💡</div>
+              <div className="planner-error-banner__content">
+                <strong>Notice</strong>
+                <p>{error}</p>
+              </div>
+              <button
+                type="button"
+                className="planner-error-banner__retry"
+                onClick={handlePlanSubmit}
+                disabled={isLoading}
+              >
+                ↻ Retry
+              </button>
             </div>
           )}
 

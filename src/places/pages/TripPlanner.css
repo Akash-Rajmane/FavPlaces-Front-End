@@ -113,6 +113,62 @@
   color: var(--color-text-main);
 }
 
+.planner-error-banner {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1.25rem;
+  margin: 0.5rem 0;
+  animation: fade-in 0.3s ease-out;
+}
+
+.planner-error-banner__icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.planner-error-banner__content {
+  flex: 1;
+  text-align: left;
+}
+
+.planner-error-banner__content strong {
+  display: block;
+  font-size: 0.95rem;
+  color: #dc2626;
+  margin-bottom: 0.2rem;
+}
+
+.planner-error-banner__content p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--color-text-main);
+  line-height: 1.45;
+}
+
+.planner-error-banner__retry {
+  background: #dc2626;
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.planner-error-banner__retry:hover {
+  background: #b91c1c;
+  transform: translateY(-1px);
+}
+
 .trip-planner__actions {
   grid-column: 1 / -1;
   display: flex;
@@ -597,3 +653,251 @@
   background: rgba(0, 0, 0, 0.02);
 }
 
+
+/* ==========================================================
+   FAVPLACES PRO PAYWALL & SUBSCRIPTION STYLES
+   ========================================================== */
+
+.trip-planner__paywall {
+  max-width: 820px;
+  margin: 0 auto;
+  animation: fade-in 0.4s ease-out;
+}
+
+.trip-planner__paywall-card {
+  position: relative;
+  background: var(--color-surface);
+  border: 2px solid rgba(210, 105, 30, 0.25);
+  border-radius: var(--radius-lg);
+  padding: 3rem 2.5rem;
+  box-shadow: 0 20px 45px -10px rgba(210, 105, 30, 0.12), 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  overflow: hidden;
+}
+
+.trip-planner__paywall-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, #f59e0b, #d2691e, #ef4444);
+}
+
+.trip-planner__paywall-icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 1.5rem auto;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(210, 105, 30, 0.2) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  box-shadow: 0 8px 20px rgba(210, 105, 30, 0.2);
+}
+
+.trip-planner__paywall-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.9rem;
+  background: linear-gradient(135deg, #f59e0b 0%, #d2691e 100%);
+  color: #ffffff;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 8px rgba(210, 105, 30, 0.35);
+}
+
+.trip-planner__paywall-card h2 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--color-text-main);
+  margin: 0 0 0.8rem 0;
+  letter-spacing: -0.5px;
+}
+
+.trip-planner__paywall-card p.paywall-subtitle {
+  font-size: 1.1rem;
+  color: var(--color-text-muted);
+  max-width: 620px;
+  margin: 0 auto 2rem auto;
+  line-height: 1.6;
+}
+
+.trip-planner__paywall-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+  text-align: left;
+  margin-bottom: 2.5rem;
+}
+
+.trip-planner__paywall-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+}
+
+.trip-planner__paywall-feature-icon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.trip-planner__paywall-feature-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+  margin-bottom: 0.2rem;
+}
+
+.trip-planner__paywall-feature-desc {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  line-height: 1.4;
+}
+
+.trip-planner__paywall-pricing {
+  background: linear-gradient(135deg, rgba(210, 105, 30, 0.06) 0%, rgba(245, 158, 11, 0.06) 100%);
+  border: 1px dashed rgba(210, 105, 30, 0.3);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.paywall-pricing__price {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.paywall-pricing__amount {
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: #d2691e;
+  line-height: 1;
+}
+
+.paywall-pricing__original {
+  font-size: 1.2rem;
+  color: var(--color-text-muted);
+  text-decoration: line-through;
+}
+
+.paywall-pricing__term {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.paywall-pricing__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.6rem;
+  background: #dcfce7;
+  color: #166534;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border-radius: 9999px;
+}
+
+.paywall-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.paywall-upgrade-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background: linear-gradient(135deg, #f59e0b 0%, #d2691e 100%);
+  color: #ffffff;
+  padding: 1rem 2.5rem;
+  border-radius: var(--radius-pill);
+  font-size: 1.1rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(210, 105, 30, 0.4);
+  transition: all var(--transition-fast);
+  text-decoration: none;
+  font-family: inherit;
+  min-width: 280px;
+}
+
+.paywall-upgrade-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(210, 105, 30, 0.5);
+  background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+}
+
+.paywall-upgrade-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.paywall-test-note {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.paywall-test-note strong {
+  color: #0284c7;
+}
+
+.trip-planner__pro-active-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.trip-planner__pro-active-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.trip-planner__pro-active-badge {
+  background: #10b981;
+  color: #ffffff;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.trip-planner__pro-active-text {
+  font-size: 0.9rem;
+  color: #065f46;
+  font-weight: 600;
+}

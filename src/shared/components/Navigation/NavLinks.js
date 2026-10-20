@@ -11,7 +11,12 @@ const NavLinks = () => {
         <NavLink to="/">Places</NavLink>
       </li>
       <li>
-        <NavLink to="/planner">Trip Planner</NavLink>
+        <NavLink to="/planner">
+          Trip Planner
+          <span className={`nav-pro-badge ${auth.isPremium ? "active-pro" : ""}`}>
+            {auth.isPremium ? "PRO ✦" : "PRO"}
+          </span>
+        </NavLink>
       </li>
       <li>
         <NavLink to="/users">All Users</NavLink>
